@@ -13,13 +13,13 @@ public class TalentController {
         this.talentService = talentService;
     }
 
-    @GetMapping("/")
-    public List<Talent> getAllTalents() {
+    @GetMapping
+    public List<TalentDTO> getAllTalents() {
         return talentService.getAllTalents();
     }
 
     @GetMapping("/{id}")
-    public Talent getTalent(@PathVariable int id) {
+    public TalentDTO getTalent(@PathVariable int id) {
         return talentService.getTalent(id);
     }
 
