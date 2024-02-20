@@ -13,7 +13,7 @@ import java.util.Locale;
 public class LanguageController {
     @PostMapping("/")
     public ResponseEntity<String> setLanguagePreference(@RequestBody String language) {
-        Locale.setDefault(Locale.of(language));
+        Locale.setDefault(Locale.forLanguageTag(language));
         return ResponseEntity.status(HttpStatus.OK).body("Language preference set to: " + language);
     }
 }
