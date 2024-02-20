@@ -41,7 +41,7 @@ public class Talent {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Talent other = (Talent) obj;
-        return id == other.id;
+        return name == other.name;
     }
 
     @Override

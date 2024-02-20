@@ -28,6 +28,10 @@ public class TranslationInterceptor implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
                                   Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         // Translate the response body here
+        if (body instanceof Map && ((Map)body).containsKey("error")) {
+            return body;
+        }
+
         translateStringsInObject(body);
         return body;
     }

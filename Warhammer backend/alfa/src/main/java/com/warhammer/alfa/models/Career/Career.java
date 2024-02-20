@@ -4,8 +4,6 @@ import java.util.Set;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import com.warhammer.alfa.models.Skill.Skill;
-
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -41,13 +39,23 @@ public class Career {
     @ManyToMany(mappedBy = "careerEntries", fetch = FetchType.EAGER)
     protected Set<Career> careerExits;
     
+    public Career(){}
+    public Career(String name, String description){
+        this.name = name;
+        this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Career other = (Career) obj;
+        return name == other.name;
+    }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + id;
-        return result;
+        return Long.hashCode(id);
     }
 
 }

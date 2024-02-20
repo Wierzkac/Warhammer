@@ -58,7 +58,7 @@ public class Skill {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Skill other = (Skill) obj;
-        return id == other.id;
+        return name == other.name;
     }
 
     @Override
