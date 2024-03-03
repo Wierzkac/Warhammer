@@ -1,12 +1,29 @@
-FROM openjdk:8-jdk-alpine
+# Use an official base image with your desired OS
+FROM ubuntu:bionic
 
-VOLUME /tmp
-ARG JAVA_OPTS
-ENV JAVA_OPTS=$JAVA_OPTS
-COPY build/libs/alfa-0.0.1-SNAPSHOT.jar alfa.jar
+ENV RUNNER_ALLOW_RUNASROOT=1
 
-EXPOSE 3000
+# Install dependencies
+RUN apt-get update
+RUN apt-get install -y curl
+RUN apt-get install -y libicu-dev
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT exec java $JAVA_OPTS -jar alfa.jar
-# For Spring-Boot project, use the entrypoint below to reduce Tomcat startup time.
-#ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar alfa.jar
+# Download and configure GitHub Actions runner
+RUN mkdir actions-runner
+RUN cd actions-runner
+
+ARG RUNNER_VERSION=2.283.3
+RUN curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz
+RUN tar xzf ./actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz
+
+ARG TOKEN=not-set
+RUN ./config.sh --url https://github.com/Wierzkac/Warhammer --token $TOKEN --work _work --name linux --runasservice --replace
+
+# Clean up
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Start the runner
+CMD ["./run.sh"]
