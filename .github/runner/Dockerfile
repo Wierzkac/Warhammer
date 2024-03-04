@@ -14,7 +14,7 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN mkdir actions-runner
 RUN cd actions-runner
 
-ARG RUNNER_VERSION=2.283.3
+ARG RUNNER_VERSION=2.314.1
 RUN curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz
 RUN tar xzf ./actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz
 
