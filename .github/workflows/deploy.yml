@@ -2,9 +2,9 @@ name: Deploy
 
 on:
   push:
-    branches: -main
-      -dev
-      -Backend_development
+    branches: ["main", "dev", "Backend_development"]
+  pull_request:
+    branches: ["main", "dev", "Backend_development"]
 
 jobs:
   run-unit-tests:
@@ -13,32 +13,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup java
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: 21
           distribution: "adopt"
 
-      - name: Change directory
-        run: cd "Warhammer backend/alfa"
+      - name: Authorize running gradlew
+        run: chmod +x gradlew
+        working-directory: ./backend/alfa
 
-      - name: Unit tests
-        run: gradlew clean build
+      - name: Unit tests and build artifact
+        run: ./gradlew build
+        working-directory: ./backend/alfa
 
       - name: Rename artifact
         run: cp build/libs/Warhammer-0.0.1-SNAPSHOT.jar Warhammer-${{ github.sha }}.jar
+        working-directory: ./backend/alfa
 
       - name: Save artifact
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v3
         with:
           name: Warhammer
-          path: Warhammer-${{ github.sha }}.jar
+          path: ./backend/alfa/Warhammer-${{ github.sha }}.jar
   deploy:
     runs-on: self-hosted
     needs: run-unit-tests
     steps:
       - name: Get artifact
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v3
         with:
           name: Warhammer
 
