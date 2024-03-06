@@ -19,12 +19,15 @@ jobs:
           java-version: 21
           distribution: "adopt"
 
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
       - name: Authorize running gradlew
         run: chmod +x gradlew
         working-directory: ./backend/alfa
 
       - name: Unit tests and build artifact
-        run: ./gradlew build
+        run: ./gradlew clean build
         working-directory: ./backend/alfa
 
       - name: Rename artifact
@@ -37,15 +40,42 @@ jobs:
           name: Warhammer
           path: ./backend/alfa/Warhammer-${{ github.sha }}.jar
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     needs: run-unit-tests
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Get artifact
         uses: actions/download-artifact@v3
         with:
           name: Warhammer
 
-      - name: Deploy
-        run: ls Warhammer*.jar
-#aws s3 cp build/libs/Warhammer-0.0.1-SNAPSHOT.jar s3://warhammer-backend-bucket/Warhammer-0.0.1-SNAPSHOT.jar
-#aws ec2 run-instances --image-id WarhammerBackendImage --count 1 --instance-type t2.micro --key-name Warhammer-ssh-key --subnet-id Warhammer-vpc --security-group WarhammerSecurityGroup --user-data file://startup.sh --associate-public-ip-address
+      - name: Prepare jar file and dockerfile for aws
+        run: cp backend/alfa/Dockerfile Dockerfile | cp Warhammer-${{ github.sha }}.jar Warhammer.jar
+
+      - name: Copy jar and backend docker file to ec2 machine
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          passphrase: ${{ secrets.EC2_PASSWORD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: "Warhammer.jar,Dockerfile"
+          target: .
+          overwrite: true
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          passphrase: ${{ secrets.EC2_PASSWORD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            sudo docker stop backend-container || true
+            sudo docker rm backend-container || true
+            sudo docker build -t backend-image .
+            sudo docker run -d --net ec2-user_warhammer_network -e MYSQL_HOST=ec2-user-db-1 --name backend-container -p 8080:8080 backend-image

@@ -1,11 +1,11 @@
 # Use an OpenJDK base image
-FROM adoptopenjdk/openjdk21:alpine-jre
-
-# Set the working directory inside the container
-WORKDIR /app
+FROM openjdk:21-jdk
 
 # Copy the JAR file from the host machine into the container
 COPY Warhammer.jar /app/Warhammer.jar
+
+# Set the working directory inside the container
+WORKDIR /app
 
 # Expose the port that Spring Boot application listens on
 EXPOSE 8080
