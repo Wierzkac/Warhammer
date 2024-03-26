@@ -8,7 +8,7 @@ on:
 
 jobs:
   run-unit-tests:
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -78,4 +78,11 @@ jobs:
             sudo docker stop backend-container || true
             sudo docker rm backend-container || true
             sudo docker build -t backend-image .
-            sudo docker run -d --net ec2-user_warhammer_network -e MYSQL_HOST=ec2-user-db-1 --name backend-container -p 8080:8080 backend-image
+            sudo docker run -d \
+              --net ec2-user_warhammer_network \
+              --name backend-container \
+              -p 8080:8080 \
+              -e MYSQL_HOST=ec2-user-db-1 \
+              -e AWS_BUCKET_ACCESS_KEY_ID=${{ secrets.AWS_BUCKET_ACCESS_KEY_ID }} \
+              -e AWS_BUCKET_SECRET_ACCESS_KEY=${{ secrets.AWS_BUCKET_SECRET_ACCESS_KEY }} \
+              backend-image
