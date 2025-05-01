@@ -1,5 +1,6 @@
 package com.warhammer.alfa.models.Skill;
 
+import com.warhammer.alfa.models.WarhammerObject.WarhammerObject;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.Set;
@@ -13,26 +14,13 @@ import com.warhammer.alfa.models.Talent.Talent;
 @Data
 @Entity
 @Table(name="skills")
-public class Skill {
-
-    @Id
-    @GeneratedValue(
-        strategy= GenerationType.AUTO,
-        generator="native"
-    )
-    @GenericGenerator(
-        name = "native",
-        strategy = "native"
-    )
-    protected int id;
-    protected String name;
+public class Skill extends WarhammerObject {
 
     @Enumerated(EnumType.STRING)
     protected AdvancedEnum type;
     
     @Enumerated(EnumType.STRING)
     protected CharacteristicEnum characteristic;
-    protected String description;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "skills_talents", 
@@ -51,18 +39,5 @@ public class Skill {
         this.type = type;
         this.characteristic = characteristic;
         this.description = description;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Skill other = (Skill) obj;
-        return name == other.name;
-    }
-
-    @Override
-    public int hashCode() {
-        return Long.hashCode(id);
     }
 }

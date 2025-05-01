@@ -2,6 +2,7 @@ package com.warhammer.alfa.models.Career;
 
 import java.util.Set;
 
+import com.warhammer.alfa.models.WarhammerObject.WarhammerObject;
 import org.hibernate.annotations.GenericGenerator;
 
 import jakarta.persistence.*;
@@ -10,20 +11,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name="careers")
-public class Career {
-    
-    @Id
-    @GeneratedValue(
-        strategy= GenerationType.AUTO,
-        generator="native"
-    )
-    @GenericGenerator(
-        name = "native",
-        strategy = "native"
-    )
-    protected int id;
-    protected String name;
-    protected String description;
+public class Career extends WarhammerObject {
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "careers_careers", 
@@ -44,18 +32,4 @@ public class Career {
         this.name = name;
         this.description = description;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Career other = (Career) obj;
-        return name == other.name;
-    }
-
-    @Override
-    public int hashCode() {
-        return Long.hashCode(id);
-    }
-
 }
