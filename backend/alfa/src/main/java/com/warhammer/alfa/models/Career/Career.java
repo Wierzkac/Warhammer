@@ -2,6 +2,7 @@ package com.warhammer.alfa.models.Career;
 
 import java.util.Set;
 
+import com.warhammer.alfa.enums.AdvanceLevelEnum;
 import com.warhammer.alfa.models.WarhammerObject.WarhammerObject;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -12,6 +13,9 @@ import lombok.Data;
 @Entity
 @Table(name="careers")
 public class Career extends WarhammerObject {
+
+    @Enumerated(EnumType.STRING)
+    protected AdvanceLevelEnum type;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "careers_careers", 

@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.util.Set;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import com.warhammer.alfa.enums.AdvancedEnum;
+import com.warhammer.alfa.enums.AdvanceLevelEnum;
 import com.warhammer.alfa.enums.CharacteristicEnum;
 import com.warhammer.alfa.models.Talent.Talent;
 
@@ -17,7 +15,7 @@ import com.warhammer.alfa.models.Talent.Talent;
 public class Skill extends WarhammerObject {
 
     @Enumerated(EnumType.STRING)
-    protected AdvancedEnum type;
+    protected AdvanceLevelEnum type;
     
     @Enumerated(EnumType.STRING)
     protected CharacteristicEnum characteristic;
@@ -34,7 +32,7 @@ public class Skill extends WarhammerObject {
     protected Set<Talent> talents;
 
     public Skill(){}
-    public Skill(String name, AdvancedEnum type, CharacteristicEnum characteristic, String description) {
+    public Skill(String name, AdvanceLevelEnum type, CharacteristicEnum characteristic, String description) {
         this.name = name;
         this.type = type;
         this.characteristic = characteristic;
