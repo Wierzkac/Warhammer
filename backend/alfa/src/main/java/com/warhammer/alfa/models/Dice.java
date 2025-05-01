@@ -2,10 +2,10 @@ package com.warhammer.alfa.models;
 
 import java.util.Random;
 
-public class Kostka {
+public class Dice {
     private Random random;
 
-    public Kostka() {
+    public Dice() {
         random = new Random();
     }
 
