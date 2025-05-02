@@ -1,17 +1,11 @@
 package com.warhammer.alfa.models.Skill;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import jakarta.persistence.EntityManager;
 
 import java.util.*;
 
 @Service
 public class SkillService {
-
-    @Autowired
-    EntityManager entityManager;
 
     final private SkillRepository skillRepository;
 

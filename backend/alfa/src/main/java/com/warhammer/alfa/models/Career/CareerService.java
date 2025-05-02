@@ -1,13 +1,11 @@
 package com.warhammer.alfa.models.Career;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class CareerService {
-
 
     final private CareerRepository careerRepository;
 
@@ -36,13 +34,12 @@ public class CareerService {
         careerRepository.deleteById(id);
     }
 
-    
-
     private CareerDTO convertToDTO(Career career) {
         CareerDTO careerDTO = new CareerDTO();
         careerDTO.setId(career.getId());
         careerDTO.setName(career.getName());
         careerDTO.setDescription(career.getDescription());
+        careerDTO.setType(career.getType().getValue());
         
         List<Map<String, Object>> careerEntries = new ArrayList<>();
         career.getCareerEntries().stream().forEach(entry -> {

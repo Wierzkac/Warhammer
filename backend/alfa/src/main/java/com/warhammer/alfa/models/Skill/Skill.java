@@ -8,10 +8,14 @@ import java.util.Set;
 import com.warhammer.alfa.enums.AdvanceLevelEnum;
 import com.warhammer.alfa.enums.CharacteristicEnum;
 import com.warhammer.alfa.models.Talent.Talent;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @Entity
 @Table(name="skills")
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@ToString(callSuper = true, exclude = {"talents"})
 public class Skill extends WarhammerObject {
 
     @Enumerated(EnumType.STRING)
@@ -20,7 +24,7 @@ public class Skill extends WarhammerObject {
     @Enumerated(EnumType.STRING)
     protected CharacteristicEnum characteristic;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "skills_talents", 
         joinColumns = {
             @JoinColumn(name = "skill_id", referencedColumnName = "id")

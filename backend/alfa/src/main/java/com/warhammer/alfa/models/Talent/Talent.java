@@ -8,13 +8,17 @@ import com.warhammer.alfa.models.Skill.Skill;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @Entity
 @Table(name = "talents")
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@ToString(callSuper = true, exclude = {"skills"})
 public class Talent extends WarhammerObject {
 
-    @ManyToMany(mappedBy = "talents", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "talents", fetch = FetchType.LAZY)
     protected Set<Skill> skills;
 
     public Talent(){}
