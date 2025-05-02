@@ -1,12 +1,12 @@
 package com.warhammer.alfa.enums;
 
-public enum AdvancedEnum {
+public enum AdvanceLevelEnum {
     BASIC("advance_type.basic"),
     ADVANCED("advance_type.advanced");
 
     private final String value;
 
-    AdvancedEnum(String value) {
+    AdvanceLevelEnum(String value) {
         this.value = value;
     }
 

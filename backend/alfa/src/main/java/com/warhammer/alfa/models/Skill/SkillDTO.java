@@ -11,5 +11,5 @@ public class SkillDTO {
     private String type;
     private String characteristic;
     private String description;
-    private List<Map<String, String>> talents;
+    private List<Map<String, Object>> talents;
 }

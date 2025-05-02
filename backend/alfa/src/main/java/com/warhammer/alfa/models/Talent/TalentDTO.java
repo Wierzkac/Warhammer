@@ -9,5 +9,5 @@ public class TalentDTO {
     private int id;
     private String name;
     private String description;
-    private List<Map<String, String>> skills;
+    private List<Map<String, Object>> skills;
 }

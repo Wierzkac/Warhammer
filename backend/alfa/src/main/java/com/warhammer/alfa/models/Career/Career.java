@@ -2,30 +2,26 @@ package com.warhammer.alfa.models.Career;
 
 import java.util.Set;
 
-import org.hibernate.annotations.GenericGenerator;
+import com.fasterxml.jackson.annotation.*;
+import com.warhammer.alfa.enums.AdvanceLevelEnum;
+import com.warhammer.alfa.models.WarhammerObject.WarhammerObject;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-@Data
 @Entity
-@Table(name="careers")
-public class Career {
-    
-    @Id
-    @GeneratedValue(
-        strategy= GenerationType.AUTO,
-        generator="native"
-    )
-    @GenericGenerator(
-        name = "native",
-        strategy = "native"
-    )
-    protected int id;
-    protected String name;
-    protected String description;
+@Table(name = "careers")
+@Data
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@ToString(callSuper = true, exclude = {"careerEntries", "careerExits"})
+public class Career extends WarhammerObject {
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Enumerated(EnumType.STRING)
+    protected AdvanceLevelEnum type;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "careers_careers", 
         joinColumns = {
             @JoinColumn(name = "career_entry", referencedColumnName = "id")
@@ -34,9 +30,12 @@ public class Career {
             @JoinColumn(name = "career_exit", referencedColumnName = "id")
         }
     )
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     protected Set<Career> careerEntries;
 
-    @ManyToMany(mappedBy = "careerEntries", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "careerEntries", fetch = FetchType.LAZY)
+    @JsonIgnore
     protected Set<Career> careerExits;
     
     public Career(){}
@@ -44,18 +43,4 @@ public class Career {
         this.name = name;
         this.description = description;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Career other = (Career) obj;
-        return name == other.name;
-    }
-
-    @Override
-    public int hashCode() {
-        return Long.hashCode(id);
-    }
-
 }

@@ -1,17 +1,11 @@
 package com.warhammer.alfa.models.Skill;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import jakarta.persistence.EntityManager;
 
 import java.util.*;
 
 @Service
 public class SkillService {
-
-    @Autowired
-    EntityManager entityManager;
 
     final private SkillRepository skillRepository;
 
@@ -20,7 +14,7 @@ public class SkillService {
     }
 
     public List<SkillDTO> getAllSkills() {
-        List<Skill> skills = (List<Skill>) skillRepository.findAllWithTalents();
+        List<Skill> skills = skillRepository.findAll();
         return skills.stream().map(this::convertToDTO).toList();
     }
 
@@ -50,10 +44,10 @@ public class SkillService {
         skillDTO.setCharacteristic(skill.getCharacteristic().getValue());
         skillDTO.setDescription(skill.getDescription());
         
-        List<Map<String, String>> talents = new ArrayList<>();
+        List<Map<String, Object>> talents = new ArrayList<>();
         skill.getTalents().stream().forEach(talent -> {
-            Map<String, String> subTalent = new HashMap<>();
-            subTalent.put("id", String.valueOf(talent.getId()));
+            Map<String, Object> subTalent = new HashMap<>();
+            subTalent.put("id", talent.getId());
             subTalent.put("name", talent.getName());
             talents.add(subTalent);
         });

@@ -1,16 +1,12 @@
 package com.warhammer.alfa.models.Talent;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;;
-
 @Repository
-public interface TalentRepository extends CrudRepository<Talent, Integer> {
+public interface TalentRepository extends JpaRepository<Talent, Integer> {
 
-    @Query("SELECT t FROM Talent t LEFT JOIN FETCH t.skills")
-    List<Talent> findAllWithSkills();
-
+    List<Talent> findAll();
 }

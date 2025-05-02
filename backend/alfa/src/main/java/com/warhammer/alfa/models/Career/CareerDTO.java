@@ -9,7 +9,8 @@ public class CareerDTO {
     private int id;
     private String name;
     private String description;
+    private String type;
     
-    private List<Map<String, String>> careerEntries;
-    private List<Map<String, String>> careerExits;
+    private List<Map<String, Object>> careerEntries;
+    private List<Map<String, Object>> careerExits;
 }

@@ -17,7 +17,7 @@ public class TalentService {
     }
 
     public List<TalentDTO> getAllTalents() {
-        List<Talent> talents = (List<Talent>) talentRepository.findAllWithSkills();
+        List<Talent> talents = talentRepository.findAll();
         return talents.stream().map(this::convertToDTO).toList();
     }
 
@@ -45,10 +45,10 @@ public class TalentService {
         talentDTO.setName(talent.getName());
         talentDTO.setDescription(talent.getDescription());
         
-        List<Map<String, String>> skills = new ArrayList<>();
+        List<Map<String, Object>> skills = new ArrayList<>();
         talent.getSkills().stream().forEach(skill -> {
-            Map<String, String> subSkill = new HashMap<>();
-            subSkill.put("id", String.valueOf(skill.getId()));
+            Map<String, Object> subSkill = new HashMap<>();
+            subSkill.put("id", skill.getId());
             subSkill.put("name", skill.getName());
             skills.add(subSkill);
         });

@@ -1,13 +1,11 @@
 package com.warhammer.alfa.models.Career;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class CareerService {
-
 
     final private CareerRepository careerRepository;
 
@@ -16,7 +14,7 @@ public class CareerService {
     }
 
     public List<CareerDTO> getAllCareers() {
-        List<Career> careers = (List<Career>) careerRepository.findAllWithCareers();
+        List<Career> careers = careerRepository.findAll();
         return careers.stream().map(this::convertToDTO).toList();
     }
 
@@ -36,27 +34,26 @@ public class CareerService {
         careerRepository.deleteById(id);
     }
 
-    
-
     private CareerDTO convertToDTO(Career career) {
         CareerDTO careerDTO = new CareerDTO();
         careerDTO.setId(career.getId());
         careerDTO.setName(career.getName());
         careerDTO.setDescription(career.getDescription());
+        careerDTO.setType(career.getType().getValue());
         
-        List<Map<String, String>> careerEntries = new ArrayList<>();
+        List<Map<String, Object>> careerEntries = new ArrayList<>();
         career.getCareerEntries().stream().forEach(entry -> {
-            Map<String, String> subCareerEntry = new HashMap<>();
-            subCareerEntry.put("id", String.valueOf(entry.getId()));
+            Map<String, Object> subCareerEntry = new HashMap<>();
+            subCareerEntry.put("id", entry.getId());
             subCareerEntry.put("name", entry.getName());
             careerEntries.add(subCareerEntry);
         });
         careerDTO.setCareerEntries(careerEntries);
         
-        List<Map<String, String>> careerExits = new ArrayList<>();
+        List<Map<String, Object>> careerExits = new ArrayList<>();
         career.getCareerExits().stream().forEach(entry -> {
-            Map<String, String> subCareerExit = new HashMap<>();
-            subCareerExit.put("id", String.valueOf(entry.getId()));
+            Map<String, Object> subCareerExit = new HashMap<>();
+            subCareerExit.put("id", entry.getId());
             subCareerExit.put("name", entry.getName());
             careerExits.add(subCareerExit);
         });

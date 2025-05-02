@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class KostkaTest {
+public class DiceTest {
 
     @Test
     void testValidInput() {
-        Kostka dice = new Kostka();
+        Dice dice = new Dice();
 
         int result;
         result = dice.roll("1k10");
@@ -23,7 +23,7 @@ public class KostkaTest {
 
     @Test
     void testInvalidInput() {
-        Kostka dice = new Kostka();
+        Dice dice = new Dice();
         assertThrows(IllegalArgumentException.class, () -> dice.roll(""), "Empty input should throw exception");
         assertThrows(IllegalArgumentException.class, () -> dice.roll("k"), "Invalid format should throw exception");
         assertThrows(IllegalArgumentException.class, () -> dice.roll("3k0"),
