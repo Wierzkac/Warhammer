@@ -16,7 +16,7 @@ public enum CharacteristicEnum {
     TOUGHNESS_BONUS("characteristic.toughness_bonus"),
     MOVEMENT("characteristic.movement"),
     MAGIC("characteristic.magic"),
-    INSTANITY_POINTS("characteristic.instanity_points"),
+    INSTANITY_POINTS("characteristic.insanity_points"),
     FATE_POINTS("characteristic.fate_points"),
     
     NONE("characteristic.none");
