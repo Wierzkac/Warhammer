@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface CareerRepository extends JpaRepository<Career, Integer> {
 
     List<Career> findAll();
+    Career findByName(String name);
 }

@@ -9,4 +9,5 @@ import java.util.List;
 public interface TalentRepository extends JpaRepository<Talent, Integer> {
 
     List<Talent> findAll();
+    Talent findByName(String name);
 }
