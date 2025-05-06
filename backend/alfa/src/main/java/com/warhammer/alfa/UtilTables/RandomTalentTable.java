@@ -9,16 +9,17 @@ import java.util.*;
 public class RandomTalentTable {
     private static final Map<RaceEnum, NavigableMap<Integer, String>> TALENT_TABLES = new HashMap<>();
 
-    public static Talent getTalentForRoll(RaceEnum race, int roll, TalentRepository talentRepository) {
+    public static Optional<Talent> getTalentForRoll(RaceEnum race, int roll, TalentRepository talentRepository) {
         NavigableMap<Integer, String> table = TALENT_TABLES.get(race);
         if (table == null) {
-            return null;
+            return Optional.empty();
         }
         Map.Entry<Integer, String> entry = table.ceilingEntry(roll);
         if (entry == null) {
-            return null;
+            return Optional.empty();
         }
-        return talentRepository.findByName(entry.getValue());
+        Talent talent = talentRepository.findByName(entry.getValue());
+        return Optional.ofNullable(talent);
     }
 
     static {

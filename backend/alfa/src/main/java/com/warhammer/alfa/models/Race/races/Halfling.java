@@ -7,7 +7,6 @@ import com.warhammer.alfa.models.Race.Race;
 import com.warhammer.alfa.models.Skill.SkillRepository;
 import com.warhammer.alfa.models.Talent.TalentRepository;
 import com.warhammer.alfa.UtilTables.RandomTalentTable;
-import com.warhammer.alfa.models.Talent.Talent;
 
 import java.util.EnumMap;
 import java.util.HashSet;
