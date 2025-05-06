@@ -53,13 +53,7 @@ public class Character {
     }
 
     private void initializeRandomTalents() {
-        // Humans get 2 random talents
-        if (race.getRaceEnum().equals(com.warhammer.alfa.enums.RaceEnum.HUMAN)) {
-            while (talents.size() < 2) {
-                int roll = (int)(Math.random() * 100) + 1;
-                Talent talentCode = RandomTalentTable.getTalentForRoll(race.getRaceEnum(), roll, talentRepository);
-                talents.add(talentCode);
-            }
-        }
+        // Race-specific talent initialization is now handled in each race's generateCharacter method
+        race.generateCharacter(this);
     }
 }

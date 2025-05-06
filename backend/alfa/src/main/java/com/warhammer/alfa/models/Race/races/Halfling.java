@@ -6,6 +6,8 @@ import com.warhammer.alfa.models.Character.Character;
 import com.warhammer.alfa.models.Race.Race;
 import com.warhammer.alfa.models.Skill.SkillRepository;
 import com.warhammer.alfa.models.Talent.TalentRepository;
+import com.warhammer.alfa.UtilTables.RandomTalentTable;
+import com.warhammer.alfa.models.Talent.Talent;
 
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -62,6 +64,9 @@ public class Halfling extends Race {
 
     @Override
     public void generateCharacter(Character character) {
-        // TODO: Implement Halfling generation
+        // Halflings get 1 random talent
+        int roll = (int)(Math.random() * 100) + 1;
+        RandomTalentTable.getTalentForRoll(raceEnum, roll, talentRepository)
+            .ifPresent(character.getTalents()::add);
     }
 } 
