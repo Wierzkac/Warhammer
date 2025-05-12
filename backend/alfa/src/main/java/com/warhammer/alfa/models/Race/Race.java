@@ -7,10 +7,12 @@ import com.warhammer.alfa.models.Skill.Skill;
 import com.warhammer.alfa.models.Skill.SkillRepository;
 import com.warhammer.alfa.models.Talent.Talent;
 import com.warhammer.alfa.models.Talent.TalentRepository;
+import lombok.Data;
 
 import java.util.Map;
 import java.util.Set;
 
+@Data
 public abstract class Race {
     protected RaceEnum raceEnum;
     protected String name;
@@ -36,48 +38,4 @@ public abstract class Race {
 
     // Abstract method to be implemented by each race
     public abstract void generateCharacter(Character character);
-
-    public RaceEnum getRaceEnum() {
-        return raceEnum;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getBackground() {
-        return background;
-    }
-
-    public String getRoleplayingHints() {
-        return roleplayingHints;
-    }
-
-    public Set<Skill> getSkills() {
-        return skills;
-    }
-
-    public Set<Talent> getTalents() {
-        return talents;
-    }
-
-    public Map<CharacteristicEnum, Integer> getCharacteristicModifiers() {
-        return characteristicModifiers;
-    }
-
-    public void setSkills(Set<Skill> skills) {
-        this.skills = skills;
-    }
-
-    public void setTalents(Set<Talent> talents) {
-        this.talents = talents;
-    }
-
-    public void setCharacteristicModifiers(Map<CharacteristicEnum, Integer> characteristicModifiers) {
-        this.characteristicModifiers = characteristicModifiers;
-    }
 } 
