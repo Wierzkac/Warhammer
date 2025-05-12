@@ -1,6 +1,5 @@
 package com.warhammer.alfa.models.Character;
 
-import com.warhammer.alfa.UtilTables.RandomTalentTable;
 import com.warhammer.alfa.UtilTables.StartingFatePointsTable;
 import com.warhammer.alfa.UtilTables.StartingWoundsTable;
 import com.warhammer.alfa.enums.CharacteristicEnum;
@@ -44,16 +43,10 @@ public class Character {
             this.talents.addAll(race.getTalents()); 
         }
         initializeWoundsAndFatePoints(woundsd10Roll, fated10Roll);
-        initializeRandomTalents();
     }
 
     private void initializeWoundsAndFatePoints(int woundsd10Roll, int fated10Roll) {
         characteristics.put(CharacteristicEnum.WOUNDS, StartingWoundsTable.getStartingWounds(race.getRaceEnum(), woundsd10Roll));
         characteristics.put(CharacteristicEnum.FATE_POINTS, StartingFatePointsTable.getStartingFatePoints(race.getRaceEnum(), fated10Roll));
-    }
-
-    private void initializeRandomTalents() {
-        // Race-specific talent initialization is now handled in each race's generateCharacter method
-        race.generateCharacter(this);
     }
 }
