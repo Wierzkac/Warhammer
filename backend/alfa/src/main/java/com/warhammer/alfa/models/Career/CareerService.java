@@ -8,18 +8,20 @@ import java.util.*;
 public class CareerService {
 
     final private CareerRepository careerRepository;
+    final private CareerMapper careerMapper;
 
-    CareerService(CareerRepository careerRepository) {
+    CareerService(CareerRepository careerRepository, CareerMapper careerMapper) {
         this.careerRepository = careerRepository;
+        this.careerMapper = careerMapper;
     }
 
     public List<CareerDTO> getAllCareers() {
         List<Career> careers = careerRepository.findAll();
-        return careers.stream().map(this::convertToDTO).toList();
+        return careerMapper.toDTOList(careers);
     }
 
     public CareerDTO getCareer(int id) {
-        return convertToDTO(careerRepository.findById(id).orElseThrow());
+        return careerMapper.toDTO(careerRepository.findById(id).orElseThrow());
     }
 
     public void createNewCareer(Career newCareer) {
@@ -32,33 +34,5 @@ public class CareerService {
 
     public void deleteCareer(int id) {
         careerRepository.deleteById(id);
-    }
-
-    private CareerDTO convertToDTO(Career career) {
-        CareerDTO careerDTO = new CareerDTO();
-        careerDTO.setId(career.getId());
-        careerDTO.setName(career.getName());
-        careerDTO.setDescription(career.getDescription());
-        careerDTO.setType(career.getType().getValue());
-        
-        List<Map<String, Object>> careerEntries = new ArrayList<>();
-        career.getCareerEntries().stream().forEach(entry -> {
-            Map<String, Object> subCareerEntry = new HashMap<>();
-            subCareerEntry.put("id", entry.getId());
-            subCareerEntry.put("name", entry.getName());
-            careerEntries.add(subCareerEntry);
-        });
-        careerDTO.setCareerEntries(careerEntries);
-        
-        List<Map<String, Object>> careerExits = new ArrayList<>();
-        career.getCareerExits().stream().forEach(entry -> {
-            Map<String, Object> subCareerExit = new HashMap<>();
-            subCareerExit.put("id", entry.getId());
-            subCareerExit.put("name", entry.getName());
-            careerExits.add(subCareerExit);
-        });
-        careerDTO.setCareerExits(careerExits);
-
-        return careerDTO;
     }
 }

@@ -2,27 +2,26 @@ package com.warhammer.alfa.models.Talent;
 
 import org.springframework.stereotype.Service;
 
-import com.warhammer.alfa.models.Skill.Skill;
-import com.warhammer.alfa.models.Skill.SkillDTO;
-
 import java.util.*;
 
 @Service
 public class TalentService {
 
     final private TalentRepository talentRepository;
+    final private TalentMapper talentMapper;
 
-    TalentService(TalentRepository talentRepository) {
+    TalentService(TalentRepository talentRepository, TalentMapper talentMapper) {
         this.talentRepository = talentRepository;
+        this.talentMapper = talentMapper;
     }
 
     public List<TalentDTO> getAllTalents() {
         List<Talent> talents = talentRepository.findAll();
-        return talents.stream().map(this::convertToDTO).toList();
+        return talentMapper.toDTOList(talents);
     }
 
     public TalentDTO getTalent(int id) {
-        return convertToDTO(talentRepository.findById(id).orElseThrow());
+        return talentMapper.toDTO(talentRepository.findById(id).orElseThrow());
     }
 
     public void createNewTalent(Talent newTalent) {
@@ -35,25 +34,5 @@ public class TalentService {
 
     public void deleteTalent(int id) {
         talentRepository.deleteById(id);
-    }
-
-    
-
-    private TalentDTO convertToDTO(Talent talent) {
-        TalentDTO talentDTO = new TalentDTO();
-        talentDTO.setId(talent.getId());
-        talentDTO.setName(talent.getName());
-        talentDTO.setDescription(talent.getDescription());
-        
-        List<Map<String, Object>> skills = new ArrayList<>();
-        talent.getSkills().stream().forEach(skill -> {
-            Map<String, Object> subSkill = new HashMap<>();
-            subSkill.put("id", skill.getId());
-            subSkill.put("name", skill.getName());
-            skills.add(subSkill);
-        });
-
-        talentDTO.setSkills(skills);
-        return talentDTO;
     }
 }
