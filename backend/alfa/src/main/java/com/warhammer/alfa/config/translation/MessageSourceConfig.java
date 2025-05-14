@@ -1,4 +1,4 @@
-package com.warhammer.alfa.config;
+package com.warhammer.alfa.config.translation;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;

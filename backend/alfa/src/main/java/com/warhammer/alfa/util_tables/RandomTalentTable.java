@@ -1,4 +1,4 @@
-package com.warhammer.alfa.UtilTables;
+package com.warhammer.alfa.util_tables;
 
 import com.warhammer.alfa.enums.RaceEnum;
 import com.warhammer.alfa.models.Talent.Talent;

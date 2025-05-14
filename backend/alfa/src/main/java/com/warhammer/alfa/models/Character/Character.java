@@ -1,7 +1,7 @@
 package com.warhammer.alfa.models.Character;
 
-import com.warhammer.alfa.UtilTables.StartingFatePointsTable;
-import com.warhammer.alfa.UtilTables.StartingWoundsTable;
+import com.warhammer.alfa.util_tables.StartingFatePointsTable;
+import com.warhammer.alfa.util_tables.StartingWoundsTable;
 import com.warhammer.alfa.enums.CharacteristicEnum;
 import com.warhammer.alfa.enums.GenderEnum;
 import com.warhammer.alfa.models.Career.Career;
