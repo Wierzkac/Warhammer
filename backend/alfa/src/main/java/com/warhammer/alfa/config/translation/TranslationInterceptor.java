@@ -1,4 +1,4 @@
-package com.warhammer.alfa.config;
+package com.warhammer.alfa.config.translation;
 
 import java.util.*;
 
@@ -11,22 +11,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import com.warhammer.alfa.exceptions.TranslationException;
-
 @Slf4j
 @RestControllerAdvice
 @Component
 public class TranslationInterceptor implements ResponseBodyAdvice<Object> {
 
-    private final List<Translator> translators;
+    private final TranslatorUtil translatorUtil;
 
-    public TranslationInterceptor(List<Translator> translators) {
-        this.translators = translators;
-        translators.sort((t1, t2) -> {
-            if (t1.translateClass().equals(Object.class)) return 1;
-            if (t2.translateClass().equals(Object.class)) return -1;
-            return 0;
-        });
+    TranslationInterceptor(TranslatorUtil translatorUtil) {
+        this.translatorUtil = translatorUtil;
     }
 
     @Override
@@ -64,10 +57,7 @@ public class TranslationInterceptor implements ResponseBodyAdvice<Object> {
     }
 
     public Object translateResponseBody(Object body, Locale locale) {
-        return translators.stream()
-            .filter(translator -> translator.translateClass().isInstance(body))
-            .findFirst()
-            .orElseThrow(() -> new TranslationException("No translator found for class: " + body.getClass()))
+        return translatorUtil.getSpecificTranslatorForClass(body.getClass())
             .translate(body, locale);
     }
 }

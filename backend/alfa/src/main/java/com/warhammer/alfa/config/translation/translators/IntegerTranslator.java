@@ -1,10 +1,13 @@
-package com.warhammer.alfa.config.translators;
+package com.warhammer.alfa.config.translation.translators;
 
 import java.util.Locale;
+
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import com.warhammer.alfa.config.Translator;
+import com.warhammer.alfa.config.translation.Translator;
 
 @Component
+@Order(2)
 public class IntegerTranslator implements Translator {
 
     @Override

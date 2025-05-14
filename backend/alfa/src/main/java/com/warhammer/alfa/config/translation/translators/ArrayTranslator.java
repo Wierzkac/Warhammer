@@ -1,26 +1,31 @@
-package com.warhammer.alfa.config.translators;
+package com.warhammer.alfa.config.translation.translators;
 
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.warhammer.alfa.config.translation.TranslatorUtil;
+
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import com.warhammer.alfa.config.TranslationInterceptor;
-import com.warhammer.alfa.config.Translator;
+import com.warhammer.alfa.config.translation.Translator;
 
 @Component
+@Order(3)
 public class ArrayTranslator implements Translator {
 
-    @Lazy
-    @Autowired
-    private TranslationInterceptor translationInterceptor;
+    private final TranslatorUtil translatorUtil;
+
+    ArrayTranslator(@Lazy TranslatorUtil translatorUtil) {
+        this.translatorUtil = translatorUtil;
+    }
 
     @Override
     public Object translate(Object content, Locale locale) {
         Object[] array = (Object[]) content;
         Object[] translatedArray = new Object[array.length];
         for (int i = 0; i < array.length; i++) {
-            translatedArray[i] = translationInterceptor.translateResponseBody(array[i], locale);
+            Class<?> clazz = array[i].getClass();
+            translatedArray[i] = translatorUtil.getSpecificTranslatorForClass(clazz).translate(array[i], locale);
         }
         return translatedArray;
     }

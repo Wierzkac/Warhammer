@@ -1,20 +1,23 @@
-package com.warhammer.alfa.config.translators;
+package com.warhammer.alfa.config.translation.translators;
 
 import java.lang.reflect.Field;
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.warhammer.alfa.config.translation.TranslatorUtil;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import com.warhammer.alfa.config.TranslationInterceptor;
-import com.warhammer.alfa.config.Translator;
+import com.warhammer.alfa.config.translation.Translator;
 
 @Component
+@Order()
 public class ObjectTranslator implements Translator {
 
-    @Lazy
-    @Autowired
-    private TranslationInterceptor translationInterceptor;
+    private final TranslatorUtil translatorUtil;
+
+    ObjectTranslator(@Lazy TranslatorUtil translatorUtil) {
+        this.translatorUtil = translatorUtil;
+    }
 
     @Override
     public Object translate(Object content, Locale locale) {
@@ -29,7 +32,8 @@ public class ObjectTranslator implements Translator {
             for (Field field : contentClass.getDeclaredFields()) {
                 field.setAccessible(true);
                 Object value = field.get(content);
-                field.set(copy, translationInterceptor.translateResponseBody(value, locale));
+                Class<?> clazz = value.getClass();
+                field.set(copy, translatorUtil.getSpecificTranslatorForClass(clazz).translate(value, locale));
             }
             return copy;
         } catch (Exception e) {

@@ -1,4 +1,4 @@
-package com.warhammer.alfa.config;
+package com.warhammer.alfa.config.translation;
 
 import java.util.Locale;
 
