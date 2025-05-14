@@ -10,19 +10,18 @@ import com.warhammer.alfa.models.Talent.Talent;
 import com.warhammer.alfa.models.Talent.TalentRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component
-public class HumanFactory implements RaceFactory {
-    private final SkillRepository skillRepository;
-    private final TalentRepository talentRepository;
+public class HumanFactory extends RaceFactory {
 
     public HumanFactory(SkillRepository skillRepository, TalentRepository talentRepository) {
-        this.skillRepository = skillRepository;
-        this.talentRepository = talentRepository;
+        super(skillRepository, talentRepository);
+        this.skillNames = new ArrayList<>(Arrays.asList(
+                "skill.common_knowledge.name", // Empire
+                "skill.gossip.name",
+                "skill.speak_language.name")); // Reikspiel
+        this.talentNames = new ArrayList<>();
     }
 
     @Override
@@ -38,20 +37,6 @@ public class HumanFactory implements RaceFactory {
         human.setTalents(loadTalents());
         human.setCharacteristicModifiers(loadCharacteristicModifiers());
         return human;
-    }
-
-    @Override
-    public Set<Skill> loadSkills() {
-        Set<Skill> skills = new HashSet<>();
-        skills.add(skillRepository.findByName("skill.common_knowledge.name")); // Empire
-        skills.add(skillRepository.findByName("skill.gossip.name"));
-        skills.add(skillRepository.findByName("skill.speak_language.name")); // Reikspiel
-        return skills;
-    }
-
-    @Override
-    public Set<Talent> loadTalents() {
-        return new HashSet<>(); // Humans get random talents
     }
 
     @Override

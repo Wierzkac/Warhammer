@@ -10,4 +10,5 @@ public interface SkillRepository extends JpaRepository<Skill, Integer> {
 
     List<Skill> findAll();
     Skill findByName(String name);
+    List<Skill> findByNameIn(List<String> names);
 }

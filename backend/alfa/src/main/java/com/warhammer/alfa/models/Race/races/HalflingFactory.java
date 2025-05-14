@@ -10,19 +10,20 @@ import com.warhammer.alfa.models.Talent.Talent;
 import com.warhammer.alfa.models.Talent.TalentRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component
-public class HalflingFactory implements RaceFactory {
-    private final SkillRepository skillRepository;
-    private final TalentRepository talentRepository;
+public class HalflingFactory extends RaceFactory {
 
     public HalflingFactory(SkillRepository skillRepository, TalentRepository talentRepository) {
-        this.skillRepository = skillRepository;
-        this.talentRepository = talentRepository;
+        super(skillRepository, talentRepository);
+        this.skillNames = new ArrayList<>(Arrays.asList(
+                "skill.common_knowledge.name", // The Moot
+                "skill.gossip.name",
+                "skill.haggle.name"));
+        this.talentNames = new ArrayList<>(Arrays.asList(
+                "talent.luck.name",
+                "talent.resistance_to_magic.name"));
     }
 
     @Override
@@ -38,23 +39,6 @@ public class HalflingFactory implements RaceFactory {
         halfling.setTalents(loadTalents());
         halfling.setCharacteristicModifiers(loadCharacteristicModifiers());
         return halfling;
-    }
-
-    @Override
-    public Set<Skill> loadSkills() {
-        Set<Skill> skills = new HashSet<>();
-        skills.add(skillRepository.findByName("skill.common_knowledge.name")); // The Moot
-        skills.add(skillRepository.findByName("skill.gossip.name"));
-        skills.add(skillRepository.findByName("skill.haggle.name"));
-        return skills;
-    }
-
-    @Override
-    public Set<Talent> loadTalents() {
-        Set<Talent> talents = new HashSet<>();
-        talents.add(talentRepository.findByName("talent.luck.name"));
-        talents.add(talentRepository.findByName("talent.resistance_to_magic.name"));
-        return talents;
     }
 
     @Override

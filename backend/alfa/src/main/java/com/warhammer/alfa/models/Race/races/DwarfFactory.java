@@ -4,25 +4,29 @@ import com.warhammer.alfa.enums.CharacteristicEnum;
 import com.warhammer.alfa.enums.RaceEnum;
 import com.warhammer.alfa.models.Race.Race;
 import com.warhammer.alfa.models.Race.RaceFactory;
-import com.warhammer.alfa.models.Skill.Skill;
 import com.warhammer.alfa.models.Skill.SkillRepository;
-import com.warhammer.alfa.models.Talent.Talent;
 import com.warhammer.alfa.models.Talent.TalentRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component
-public class DwarfFactory implements RaceFactory {
-    private final SkillRepository skillRepository;
-    private final TalentRepository talentRepository;
+public class DwarfFactory extends RaceFactory {
 
     public DwarfFactory(SkillRepository skillRepository, TalentRepository talentRepository) {
-        this.skillRepository = skillRepository;
-        this.talentRepository = talentRepository;
+        super(skillRepository, talentRepository);
+        this.skillNames = new ArrayList<>(Arrays.asList(
+                "skill.common_knowledge.name",
+                "skill.speak_language.name",  // Khazalid
+                "skill.speak_language.name",  // Reikspiel
+                "skill.trade.name")); // Miner, Smith, or Stoneworker
+        this.talentNames = new ArrayList<>(Arrays.asList(
+                "talent.dwarfcraft.name",
+                "talent.grudge_born_fury.name",
+                "talent.night_vision.name",
+                "talent.resistance_to_magic.name",
+                "talent.stout_hearted.name",
+                "talent.sturdy.name"));
     }
 
     @Override
@@ -38,28 +42,6 @@ public class DwarfFactory implements RaceFactory {
         dwarf.setTalents(loadTalents());
         dwarf.setCharacteristicModifiers(loadCharacteristicModifiers());
         return dwarf;
-    }
-
-    @Override
-    public Set<Skill> loadSkills() {
-        Set<Skill> skills = new HashSet<>();
-        skills.add(skillRepository.findByName("skill.common_knowledge.name"));
-        skills.add(skillRepository.findByName("skill.speak_language.name")); // Khazalid
-        skills.add(skillRepository.findByName("skill.speak_language.name")); // Reikspiel
-        skills.add(skillRepository.findByName("skill.trade.name")); // Miner, Smith, or Stoneworker
-        return skills;
-    }
-
-    @Override
-    public Set<Talent> loadTalents() {
-        Set<Talent> talents = new HashSet<>();
-        talents.add(talentRepository.findByName("talent.dwarfcraft.name"));
-        talents.add(talentRepository.findByName("talent.grudge_born_fury.name"));
-        talents.add(talentRepository.findByName("talent.night_vision.name"));
-        talents.add(talentRepository.findByName("talent.resistance_to_magic.name"));
-        talents.add(talentRepository.findByName("talent.stout_hearted.name"));
-        talents.add(talentRepository.findByName("talent.sturdy.name"));
-        return talents;
     }
 
     @Override

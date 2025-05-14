@@ -10,4 +10,5 @@ public interface TalentRepository extends JpaRepository<Talent, Integer> {
 
     List<Talent> findAll();
     Talent findByName(String name);
+    List<Talent> findByNameIn(List<String> names);
 }
