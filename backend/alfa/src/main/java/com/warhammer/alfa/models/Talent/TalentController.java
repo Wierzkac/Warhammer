@@ -22,19 +22,4 @@ public class TalentController {
     public TalentDTO getTalent(@PathVariable int id) {
         return talentService.getTalent(id);
     }
-
-    @PostMapping("/")
-    public void createNewTalent(@RequestBody Talent newTalent) {
-        talentService.createNewTalent(newTalent);
-    }
-
-    @PutMapping("/{id}")
-    public void updateTalent(@PathVariable int id, @RequestBody Talent talent) {
-        talentService.updateTalent(id, talent);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteTalent(@PathVariable int id) {
-        talentService.deleteTalent(id);
-    }
 }

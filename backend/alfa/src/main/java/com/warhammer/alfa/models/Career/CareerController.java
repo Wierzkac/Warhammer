@@ -23,19 +23,4 @@ public class CareerController {
     public CareerDTO getCareer(@PathVariable int id) {
         return careerService.getCareer(id);
     }
-
-    @PostMapping("/")
-    public void createNewCareer(@RequestBody Career newCareer) {
-        careerService.createNewCareer(newCareer);
-    }
-
-    @PutMapping("/{id}")
-    public void updateCareer(@PathVariable int id, @RequestBody Career career) {
-        careerService.updateCareer(id, career);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteCareer(@PathVariable int id) {
-        careerService.deleteCareer(id);
-    }
 }

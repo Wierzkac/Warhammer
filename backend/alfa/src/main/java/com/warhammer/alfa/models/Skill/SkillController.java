@@ -23,19 +23,4 @@ public class SkillController {
     public SkillDTO getSkill(@PathVariable int id) {
         return skillService.getSkill(id);
     }
-
-    @PostMapping("/")
-    public void createNewSkill(@RequestBody Skill newSkill) {
-        skillService.createNewSkill(newSkill);
-    }
-
-    @PutMapping("/{id}")
-    public void updateSkill(@PathVariable int id, @RequestBody Skill skill) {
-        skillService.updateSkill(id, skill);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteSkill(@PathVariable int id) {
-        skillService.deleteSkill(id);
-    }
 }

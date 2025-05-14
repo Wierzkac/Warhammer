@@ -23,16 +23,4 @@ public class SkillService {
     public SkillDTO getSkill(int id) {
         return skillMapper.toDTO(skillRepository.findById(id).orElseThrow());
     }
-
-    public void createNewSkill(Skill newSkill) {
-        skillRepository.save(newSkill);
-    }
-
-    public void updateSkill(int id, Skill skill) {
-        skillRepository.save(skill);
-    }
-
-    public void deleteSkill(int id) {
-        skillRepository.deleteById(id);
-    }
 }

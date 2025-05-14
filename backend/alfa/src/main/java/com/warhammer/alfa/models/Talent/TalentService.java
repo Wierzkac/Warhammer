@@ -23,16 +23,4 @@ public class TalentService {
     public TalentDTO getTalent(int id) {
         return talentMapper.toDTO(talentRepository.findById(id).orElseThrow());
     }
-
-    public void createNewTalent(Talent newTalent) {
-        talentRepository.save(newTalent);
-    }
-
-    public void updateTalent(int id, Talent talent) {
-        talentRepository.save(talent);
-    }
-
-    public void deleteTalent(int id) {
-        talentRepository.deleteById(id);
-    }
 }
