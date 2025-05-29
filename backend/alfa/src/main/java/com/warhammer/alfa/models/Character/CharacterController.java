@@ -14,7 +14,7 @@ public class CharacterController {
         this.characterService = characterService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/createRandomCharacter")
     public CharacterDTO createRandomCharacter(
             @RequestParam String name,
             @RequestParam RaceEnum race,

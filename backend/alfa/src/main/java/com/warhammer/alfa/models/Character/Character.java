@@ -11,7 +11,6 @@ import com.warhammer.alfa.models.Career.Career;
 import com.warhammer.alfa.models.Race.Race;
 import com.warhammer.alfa.models.Skill.Skill;
 import com.warhammer.alfa.models.Talent.Talent;
-import com.warhammer.alfa.models.Talent.TalentRepository;
 import com.warhammer.alfa.models.User.User;
 import lombok.Data;
 
@@ -26,23 +25,19 @@ public class Character {
     private GenderEnum gender;
     private Career currentCareer;
     private Map<CharacteristicEnum, Integer> characteristics;
-    private TalentRepository talentRepository;
-    private Set<Talent> talents;
-    private Set<Skill> skills;
+    private Set<Talent> talents = new HashSet<Talent>();
+    private Set<Skill> skills = new HashSet<Skill>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Character(String name, Race race, GenderEnum gender, Career currentCareer, int woundsd10Roll, int fated10Roll, TalentRepository talentRepository) {
+    public Character(String name, Race race, GenderEnum gender, Career currentCareer, int woundsd10Roll, int fated10Roll) {
         this.name = name;
         this.race = race;
         this.gender = gender;
         this.currentCareer = currentCareer;
         this.characteristics = new HashMap<>(race.getCharacteristicModifiers());
-        this.skills = new HashSet<Skill>(); // Initialize empty skills set
-        this.talents = new HashSet<Talent>(); // Initialize empty talents set
-        this.talentRepository = talentRepository;
         if (race.getSkills() != null) {
             this.skills.addAll(race.getSkills());
         }
