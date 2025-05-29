@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", uses = {CareerMapper.class, SkillMapper.class, TalentMapper.class})
 public interface CharacterMapper {
 
-    @Mapping(target = "raceName", source = "race.raceEnum.value")
+    @Mapping(target = "raceName", source = "race.value")
     @Mapping(target = "genderName", source = "gender.value")
     @Mapping(target = "characteristics", source = "characteristics", qualifiedByName = "characteristicsToMap")
     @Mapping(target = "currentCareer", source = "currentCareer")

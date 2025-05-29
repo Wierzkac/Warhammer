@@ -3,8 +3,11 @@ package com.warhammer.alfa.util_tables;
 import com.warhammer.alfa.enums.RaceEnum;
 import com.warhammer.alfa.models.Career.Career;
 import com.warhammer.alfa.models.Career.CareerRepository;
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 
+@Component
 public class StartingCareerTable {
     private final CareerRepository careerRepository;
 

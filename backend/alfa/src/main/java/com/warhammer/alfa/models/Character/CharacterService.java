@@ -11,27 +11,29 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CharacterService {
+    private final CharacterFactory characterFactory;
     private final RaceFactoryProvider raceFactoryProvider;
     private final CharacterMapper characterMapper;
     private final StartingCareerTable startingCareerTable;
 
     public CharacterService(
+            CharacterFactory characterFactory,
             RaceFactoryProvider raceFactoryProvider,
             CharacterMapper characterMapper,
             StartingCareerTable startingCareerTable) {
+        this.characterFactory = characterFactory;
         this.raceFactoryProvider = raceFactoryProvider;
         this.characterMapper = characterMapper;
         this.startingCareerTable = startingCareerTable; 
     }
 
     public CharacterDTO createRandomCharacter(String name, RaceEnum raceEnum, GenderEnum gender) {
-        Race race = raceFactoryProvider.createRace(raceEnum);
         int careerRoll = Dice.roll("1k100");
         int woundsRoll = Dice.roll("1k10");
         int fateRoll = Dice.roll("1k10");
         Career startingCareer = startingCareerTable.getCareerForRoll(raceEnum, careerRoll);
 
-        Character character = new Character(name, race, gender, startingCareer, woundsRoll, fateRoll);
+        Character character = characterFactory.createCharacter(name, raceEnum, gender, startingCareer, woundsRoll, fateRoll);
         return characterMapper.toDTO(character);
     }
 }
