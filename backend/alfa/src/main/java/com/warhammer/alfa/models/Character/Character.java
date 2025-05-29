@@ -2,6 +2,9 @@ package com.warhammer.alfa.models.Character;
 
 import com.warhammer.alfa.util_tables.StartingFatePointsTable;
 import com.warhammer.alfa.util_tables.StartingWoundsTable;
+
+import jakarta.persistence.*;
+
 import com.warhammer.alfa.enums.CharacteristicEnum;
 import com.warhammer.alfa.enums.GenderEnum;
 import com.warhammer.alfa.models.Career.Career;
@@ -9,13 +12,13 @@ import com.warhammer.alfa.models.Race.Race;
 import com.warhammer.alfa.models.Skill.Skill;
 import com.warhammer.alfa.models.Talent.Talent;
 import com.warhammer.alfa.models.Talent.TalentRepository;
+import com.warhammer.alfa.models.User.User;
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+@Entity
+@Table(name = "characters")
 @Data
 public class Character {
     private String name;
@@ -26,6 +29,10 @@ public class Character {
     private TalentRepository talentRepository;
     private Set<Talent> talents;
     private Set<Skill> skills;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Character(String name, Race race, GenderEnum gender, Career currentCareer, int woundsd10Roll, int fated10Roll, TalentRepository talentRepository) {
         this.name = name;
