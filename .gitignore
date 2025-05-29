@@ -1,2 +1,6 @@
 backend/
 .vscode/
+node_modules/
+frontend/Warhammer/node_modules/
+frontend/Warhammer/.expo/
+package-lock.json
