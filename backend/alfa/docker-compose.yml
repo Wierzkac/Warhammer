@@ -1,0 +1,25 @@
+version: '3.4'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'Warhammer'
+      MYSQL_USER: 'WarhammerAdmin'
+      MYSQL_PASSWORD: '*k]U4_@75E?4N>2mV:_0*7'
+      MYSQL_ROOT_PASSWORD: 'kx^VLk}s82K8r4[wTCFx|3s:Y*F.}j+'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - my-db:/var/lib/mysql
+    networks:
+      - warhammer_network
+
+volumes:
+  my-db:
+
+networks:
+  warhammer_network:
