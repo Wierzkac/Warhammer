@@ -38,3 +38,9 @@ out/
 
 ### File with env secrets
 .env
+
+### Front end ###
+frontend/Warhammer/.expo/
+frontend/Warhammer/node_modules/
+node_modules/
+package-lock.json
