@@ -1,54 +1,50 @@
-import { ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-native'
-import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { t } from 'react-native-tailwindcss';
-import * as Icon from "react-native-feather";
-import { careers } from '../assets/placeholders'
-import FeatureRow from '../components/FeatureRow'
+import React from 'react';
+import { ROUTES } from '../constants/constants';
+import useFetch from '../hooks/useFetch';
+import { fetchCareers, fetchTalents, fetchSkills } from '../services/api';
+import ScreenLayout from '../components/common/ScreenLayout';
+import FeatureRow from '../components/FeatureRow';
 
+const MainScreen = ({ navigation }) => {
+  const { data: careers, loading: careersLoading, error: careersError } = useFetch(fetchCareers);
+  const { data: talents, loading: talentsLoading, error: talentsError } = useFetch(fetchTalents);
+  const { data: skills, loading: skillsLoading, error: skillsError } = useFetch(fetchSkills);
 
-export default function MainScreen() {
+  const loading = careersLoading || talentsLoading || skillsLoading;
+  const error = careersError || talentsError || skillsError;
+
+  const handleSeeAll = (items, title) => {
+    navigation.navigate(ROUTES.ITEMS_LIST, { items, title });
+  };
+
   return (
-    <SafeAreaView style={[t.bgWhite]}>
-      <StatusBar style={[t.darkContent]}></StatusBar>
+    <ScreenLayout
+      showProfile={true}
+      loading={loading}
+      error={error}
+    >
+      {/* Careers Section */}
+      <FeatureRow
+        title="Careers"
+        description="Choose your path"
+        items={careers || []}
+      />
 
-      {/* Search bar */}
-      <View style={[t.flexRow, t.itemsCenter, t.spaceX2, t.pX4, t.pB2]}>
-        <View style={[t.flexRow, t.flex1, t.itemsCenter, t.p3, t.roundedFull, t.border, t.borderGray300]}>
-          <Icon.Search width="25" height="25" stroke="grey"></Icon.Search>
-          <TextInput placeholder='' style={[t.mL2, t.flex1]}/>
-        </View>
-      </View>
-      
-      {/* Main View */}
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom: 20
-        }}>
+      {/* Talents Section */}
+      <FeatureRow
+        title="Talents"
+        description="Discover your abilities"
+        items={talents || []}
+      />
 
-        {/* Careers */}
-        {/* Skills */}
-        {/* Talents */}
-        {/* Items */}
-        {/* Spells */}
-        <View style={[t.mT5]}>
-          {
-            [careers, careers, careers, careers, careers, careers, careers, careers, careers].map((item, index) => {
-              return (
-                <FeatureRow
-                  key={index}
-                  title={item.title}
-                  items={item.items}
-                  description={item.description}
-                />
-            )
-            })
-          }
-        </View>
-        
+      {/* Skills Section */}
+      <FeatureRow
+        title="Skills"
+        description="Master your craft"
+        items={skills || []}
+      />
+    </ScreenLayout>
+  );
+};
 
-      </ScrollView>
-    </SafeAreaView>
-  )
-}
+export default MainScreen;
