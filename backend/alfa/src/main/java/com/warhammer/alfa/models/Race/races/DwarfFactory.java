@@ -13,6 +13,9 @@ import java.util.*;
 @Component
 public class DwarfFactory extends RaceFactory {
 
+    private final List<String> skillNames;
+    private final List<String> talentNames;
+
     public DwarfFactory(SkillRepository skillRepository, TalentRepository talentRepository) {
         super(skillRepository, talentRepository);
         this.skillNames = new ArrayList<>(Arrays.asList(
@@ -38,8 +41,8 @@ public class DwarfFactory extends RaceFactory {
             "Dwarfs have a long and storied history in the Old World.",
             "Dwarfs are stubborn, honorable, and value tradition."
         );
-        dwarf.setSkills(loadSkills());
-        dwarf.setTalents(loadTalents());
+        dwarf.setSkills(loadSkills(skillNames));
+        dwarf.setTalents(loadTalents(talentNames));
         dwarf.setCharacteristicModifiers(loadCharacteristicModifiers());
         return dwarf;
     }

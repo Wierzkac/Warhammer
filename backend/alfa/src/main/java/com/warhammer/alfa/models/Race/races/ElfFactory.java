@@ -15,6 +15,9 @@ import java.util.*;
 @Component
 public class ElfFactory extends RaceFactory {
 
+    private final List<String> skillNames;
+    private final List<String> talentNames;
+
     public ElfFactory(SkillRepository skillRepository, TalentRepository talentRepository) {
         super(skillRepository, talentRepository);
         this.skillNames = new ArrayList<>(Arrays.asList(
@@ -34,8 +37,8 @@ public class ElfFactory extends RaceFactory {
             "race.elf.history",
             "race.elf.personality"
         );
-        elf.setSkills(loadSkills());
-        elf.setTalents(loadTalents());
+        elf.setSkills(loadSkills(skillNames));
+        elf.setTalents(loadTalents(talentNames));
         elf.setCharacteristicModifiers(loadCharacteristicModifiers());
         return elf;
     }

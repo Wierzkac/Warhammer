@@ -4,9 +4,7 @@ import com.warhammer.alfa.enums.CharacteristicEnum;
 import com.warhammer.alfa.enums.RaceEnum;
 import com.warhammer.alfa.models.Race.Race;
 import com.warhammer.alfa.models.Race.RaceFactory;
-import com.warhammer.alfa.models.Skill.Skill;
 import com.warhammer.alfa.models.Skill.SkillRepository;
-import com.warhammer.alfa.models.Talent.Talent;
 import com.warhammer.alfa.models.Talent.TalentRepository;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +12,9 @@ import java.util.*;
 
 @Component
 public class HumanFactory extends RaceFactory {
+
+    private final List<String> skillNames;
+    private final List<String> talentNames;
 
     public HumanFactory(SkillRepository skillRepository, TalentRepository talentRepository) {
         super(skillRepository, talentRepository);
@@ -33,8 +34,8 @@ public class HumanFactory extends RaceFactory {
             "race.human.history",
             "race.human.personality"
         );
-        human.setSkills(loadSkills());
-        human.setTalents(loadTalents());
+        human.setSkills(loadSkills(skillNames));
+        human.setTalents(loadTalents(talentNames));
         human.setCharacteristicModifiers(loadCharacteristicModifiers());
         return human;
     }

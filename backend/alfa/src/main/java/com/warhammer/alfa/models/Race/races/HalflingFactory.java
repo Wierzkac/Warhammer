@@ -15,6 +15,9 @@ import java.util.*;
 @Component
 public class HalflingFactory extends RaceFactory {
 
+    private final List<String> skillNames;
+    private final List<String> talentNames;
+
     public HalflingFactory(SkillRepository skillRepository, TalentRepository talentRepository) {
         super(skillRepository, talentRepository);
         this.skillNames = new ArrayList<>(Arrays.asList(
@@ -35,8 +38,8 @@ public class HalflingFactory extends RaceFactory {
             "race.halfling.history",
             "race.halfling.personality"
         );
-        halfling.setSkills(loadSkills());
-        halfling.setTalents(loadTalents());
+        halfling.setSkills(loadSkills(skillNames));
+        halfling.setTalents(loadTalents(talentNames));
         halfling.setCharacteristicModifiers(loadCharacteristicModifiers());
         return halfling;
     }
