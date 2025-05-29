@@ -6,9 +6,11 @@ import com.warhammer.alfa.models.Career.CareerRepository;
 import java.util.*;
 
 public class StartingCareerTable {
-    private static final Map<RaceEnum, NavigableMap<Integer, String>> CAREER_TABLES = new HashMap<>();
+    private final CareerRepository careerRepository;
 
-    public static Career getCareerForRoll(RaceEnum race, int roll, CareerRepository careerRepository) {
+    private final Map<RaceEnum, NavigableMap<Integer, String>> CAREER_TABLES = new HashMap<>();
+
+    public Career getCareerForRoll(RaceEnum race, int roll) {
         NavigableMap<Integer, String> table = CAREER_TABLES.get(race);
         if (table == null) {
             return null;
@@ -20,7 +22,9 @@ public class StartingCareerTable {
         return careerRepository.findByName(entry.getValue());
     }
 
-    static {
+    StartingCareerTable(CareerRepository careerRepository) {
+        this.careerRepository = careerRepository;
+        
         NavigableMap<Integer, String> dwarf = new TreeMap<>();
         dwarf.put(2, "career.agitator.name");
         dwarf.put(6, "career.bodyguard.name");
