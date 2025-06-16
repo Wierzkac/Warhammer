@@ -39,8 +39,4 @@ public class Career extends WarhammerObject {
     protected Set<Career> careerExits;
     
     public Career(){}
-    public Career(String name, String description){
-        this.name = name;
-        this.description = description;
-    }
 }
