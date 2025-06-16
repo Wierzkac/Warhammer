@@ -1,76 +1,115 @@
-import { View, Text, TouchableOpacity, TextInput } from 'react-native'
-import React, { useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { t } from 'react-native-tailwindcss';
 import { useNavigation } from '@react-navigation/native';
-import Header from '../components/Header';
+import { ROUTES } from '../constants/constants';
+import { required, email } from '../utils/validation';
+import useForm from '../hooks/useForm';
+import ScreenLayout from '../components/common/ScreenLayout';
+import Input from '../components/common/Input';
+import Button from '../components/common/Button';
+import { useAuth } from '../context/AuthContext';
 
-export default function RegisterScreen() {
+const RegisterScreen = () => {
   const navigation = useNavigation();
-  const [nickname, setNickname] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { register, error: authError } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleRegister = () => {
-    // TODO: Implement actual registration logic
-    console.log('Register attempt:', { nickname, email, password });
+  const { values, errors, touched, handleChange, handleBlur, handleSubmit } = useForm(
+    {
+      nickname: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    {
+      nickname: [required],
+      email: [required, email],
+      password: [required],
+      confirmPassword: [required, (value) => value === values.password || 'Passwords do not match'],
+    }
+  );
+
+  const onSubmit = async (formValues) => {
+    try {
+      setIsLoading(true);
+      await register(formValues.nickname, formValues.email, formValues.password);
+      navigation.navigate(ROUTES.PROFILE);
+    } catch (err) {
+      Alert.alert('Registration Failed', err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <SafeAreaView style={[t.flex1, t.bgWhite]}>
-      <Header showBack={true} />
-      
-      <View style={[t.flex1, t.pX6, t.justifyCenter]}>
-        <Text style={[t.text2xl, t.fontBold, t.mB8, t.textCenter]}>Register</Text>
-        
-        <View style={[t.mB4]}>
-          <Text style={[t.textGray600, t.mB2]}>Nickname</Text>
-          <TextInput
-            style={[t.border, t.borderGray300, t.roundedLg, t.pX4, t.pY3]}
-            placeholder="Choose a nickname"
-            value={nickname}
-            onChangeText={setNickname}
-            autoCapitalize="none"
-          />
+    <ScreenLayout showBack={true}>
+      <View style={[t.flex1, t.p4, t.justifyCenter]}>
+        <Text style={[t.text3xl, t.fontBold, t.mB8, t.textCenter]}>
+          Create Account
+        </Text>
+
+        <Input
+          label="Nickname"
+          value={values.nickname}
+          onChangeText={(text) => handleChange('nickname', text)}
+          onBlur={() => handleBlur('nickname')}
+          placeholder="Choose a nickname"
+          error={touched.nickname && errors.nickname}
+        />
+
+        <Input
+          label="Email"
+          value={values.email}
+          onChangeText={(text) => handleChange('email', text)}
+          onBlur={() => handleBlur('email')}
+          placeholder="Enter your email"
+          keyboardType="email-address"
+          error={touched.email && errors.email}
+        />
+
+        <Input
+          label="Password"
+          value={values.password}
+          onChangeText={(text) => handleChange('password', text)}
+          onBlur={() => handleBlur('password')}
+          placeholder="Create a password"
+          secureTextEntry
+          error={touched.password && errors.password}
+        />
+
+        <Input
+          label="Confirm Password"
+          value={values.confirmPassword}
+          onChangeText={(text) => handleChange('confirmPassword', text)}
+          onBlur={() => handleBlur('confirmPassword')}
+          placeholder="Confirm your password"
+          secureTextEntry
+          error={touched.confirmPassword && errors.confirmPassword}
+        />
+
+        {authError && (
+          <Text style={[t.textRed500, t.mT2, t.textCenter]}>
+            {authError}
+          </Text>
+        )}
+
+        <Button
+          title="Register"
+          onPress={() => handleSubmit(onSubmit)}
+          style={[t.mT4]}
+          loading={isLoading}
+        />
+
+        <View style={[t.flexRow, t.justifyCenter, t.mT4]}>
+          <Text style={[t.textGray600]}>Already have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate(ROUTES.LOGIN)}>
+            <Text style={[t.textBlue500, t.fontBold]}>Login</Text>
+          </TouchableOpacity>
         </View>
-
-        <View style={[t.mB4]}>
-          <Text style={[t.textGray600, t.mB2]}>Email</Text>
-          <TextInput
-            style={[t.border, t.borderGray300, t.roundedLg, t.pX4, t.pY3]}
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-        </View>
-
-        <View style={[t.mB6]}>
-          <Text style={[t.textGray600, t.mB2]}>Password</Text>
-          <TextInput
-            style={[t.border, t.borderGray300, t.roundedLg, t.pX4, t.pY3]}
-            placeholder="Create a password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-        </View>
-
-        <TouchableOpacity 
-          style={[t.bgOrange500, t.pY3, t.roundedFull, t.mB4]}
-          onPress={handleRegister}
-        >
-          <Text style={[t.textWhite, t.textCenter, t.fontBold]}>Register</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Login')}
-          style={[t.itemsCenter]}
-        >
-          <Text style={[t.textOrange500]}>Already have an account? Login</Text>
-        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </ScreenLayout>
   );
-} 
+};
+
+export default RegisterScreen; 

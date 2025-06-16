@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TextInput, Text } from 'react-native';
 import { t } from 'react-native-tailwindcss';
-import { colors } from '../../theme/styles';
+import { colors } from '../../../styles';
 
 const Input = ({
   value,

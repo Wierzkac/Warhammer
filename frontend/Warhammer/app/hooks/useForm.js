@@ -1,75 +1,96 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useFormState } from './form/useFormState';
+import { useFormValidation } from './form/useFormValidation';
+import * as validators from '../utils/validation';
 
-const useForm = (initialValues = {}, validationRules = {}) => {
-  const [values, setValues] = useState(initialValues);
-  const [errors, setErrors] = useState({});
-  const [touched, setTouched] = useState({});
+// Example of how to use validation rules with the existing validators
+const createValidationRules = (rules) => {
+  const validationRules = {};
+  
+  Object.entries(rules).forEach(([field, fieldRules]) => {
+    validationRules[field] = fieldRules.map(rule => {
+      if (typeof rule === 'function') {
+        return rule;
+      }
+      
+      // Handle rule objects with parameters
+      if (rule.validator && rule.params) {
+        return {
+          validator: rule.validator,
+          params: rule.params
+        };
+      }
+      
+      return rule;
+    });
+  });
+  
+  return validationRules;
+};
 
-  const validateField = useCallback((name, value) => {
-    if (!validationRules[name]) return '';
+const useForm = (initialValues = {}, validationRules = {}, formId = 'default') => {
+  const {
+    values,
+    touched,
+    isSubmitting,
+    isValid,
+    setValues,
+    setFieldValue,
+    setFieldTouched,
+    setIsSubmitting,
+    setIsValid,
+    reset
+  } = useFormState(initialValues, formId);
 
-    const rules = validationRules[name];
-    for (const rule of rules) {
-      const error = rule(value, values);
-      if (error) return error;
-    }
-    return '';
-  }, [validationRules, values]);
+  const {
+    errors,
+    validateField,
+    validateForm,
+    setFieldError,
+    clearErrors
+  } = useFormValidation(validationRules);
 
   const handleChange = useCallback((name, value) => {
-    setValues(prev => ({ ...prev, [name]: value }));
+    setFieldValue(name, value);
+
     if (touched[name]) {
-      const error = validateField(name, value);
-      setErrors(prev => ({ ...prev, [name]: error }));
+      const error = validateField(name, value, values);
+      setFieldError(name, error);
     }
-  }, [touched, validateField]);
+  }, [touched, validateField, setFieldValue, setFieldError, values]);
 
   const handleBlur = useCallback((name) => {
-    setTouched(prev => ({ ...prev, [name]: true }));
-    const error = validateField(name, values[name]);
-    setErrors(prev => ({ ...prev, [name]: error }));
-  }, [validateField, values]);
+    setFieldTouched(name);
+    const error = validateField(name, values[name], values);
+    setFieldError(name, error);
+  }, [validateField, setFieldTouched, setFieldError, values]);
 
-  const handleSubmit = useCallback((onSubmit) => {
-    const newErrors = {};
-    let hasErrors = false;
-
-    Object.keys(validationRules).forEach(name => {
-      const error = validateField(name, values[name]);
-      if (error) {
-        newErrors[name] = error;
-        hasErrors = true;
+  const handleSubmit = useCallback(async (onSubmit) => {
+    setIsSubmitting(true);
+    try {
+      if (validateForm(values)) {
+        await onSubmit(values);
       }
-    });
-
-    setErrors(newErrors);
-    setTouched(
-      Object.keys(validationRules).reduce((acc, key) => ({
-        ...acc,
-        [key]: true
-      }), {})
-    );
-
-    if (!hasErrors) {
-      onSubmit(values);
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [validateField, values]);
-
-  const reset = useCallback(() => {
-    setValues(initialValues);
-    setErrors({});
-    setTouched({});
-  }, [initialValues]);
+  }, [validateForm, values, setIsSubmitting]);
 
   return {
     values,
     errors,
     touched,
+    isSubmitting,
+    isValid,
     handleChange,
     handleBlur,
     handleSubmit,
     reset,
-    setValues
+    setValues,
+    setFieldValue,
+    setFieldTouched,
+    setFieldError,
+    clearErrors
   };
 };
 

@@ -1,16 +1,13 @@
 import { View, Text, Image, ScrollView } from 'react-native'
 import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { t } from 'react-native-tailwindcss';
-import Header from '../components/Header';
+import ScreenLayout from '../components/common/ScreenLayout';
 
 export default function ItemDetailsScreen({ route }) {
   const { item } = route.params;
 
   return (
-    <SafeAreaView style={[t.flex1, t.bgGray50]}>
-      <Header showBack={true} showProfile={true} />
-      
+    <ScreenLayout showBack={true} showProfile={true}>
       <ScrollView 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[t.pB4]}
@@ -37,6 +34,6 @@ export default function ItemDetailsScreen({ route }) {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 } 

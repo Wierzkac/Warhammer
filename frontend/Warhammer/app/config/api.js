@@ -1,18 +1,22 @@
 const ENV = {
   dev: {
-    apiUrl: 'http://localhost:8080/api'
+    apiUrl: 'http://localhost:8080',
+    timeout: 10000,
+    cacheDuration: 30 * 60 * 1000, // 30 minutes
   },
   prod: {
-    apiUrl: 'https://your-production-server.com/api'
+    apiUrl: 'https://api.warhammer-app.com/api',
+    timeout: 15000,
+    cacheDuration: 30 * 60 * 1000, // 30 minutes
   }
 };
 
-const getEnvVars = () => {
-  // You can change this to __DEV__ for React Native's development mode
-  if (process.env.NODE_ENV === 'development') {
-    return ENV.dev;
-  }
-  return ENV.prod;
+const getEnvConfig = () => {
+  const config = process.env.NODE_ENV === 'production' ? ENV.prod : ENV.dev;
+  console.log('Using API configuration:', config);
+  return config;
 };
 
-export default getEnvVars(); 
+const apiConfig = getEnvConfig();
+
+export default apiConfig; 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StyleSheet, View } from 'react-native';
 import MainScreen from './app/screens/MainScreen';
 import ProfileScreen from './app/screens/ProfileScreen';
 import LoginScreen from './app/screens/LoginScreen';
@@ -12,10 +12,11 @@ const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
   return (
-    <NavigationContainer>
+    <View style={styles.container}>
       <Stack.Navigator 
         screenOptions={{
-          headerShown: false
+          headerShown: false,
+          contentStyle: { backgroundColor: 'transparent' }
         }}
       >
         <Stack.Screen name="Home" component={MainScreen} />
@@ -25,6 +26,13 @@ export default function Navigation() {
         <Stack.Screen name="ItemsList" component={ItemsListScreen} />
         <Stack.Screen name="ItemDetails" component={ItemDetailsScreen} />
       </Stack.Navigator>
-    </NavigationContainer>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent'
+  }
+});

@@ -1,50 +1,73 @@
-import { View, TouchableOpacity, Image } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { View, Text, Pressable, Image } from 'react-native';
 import { t } from 'react-native-tailwindcss';
-import * as Icon from "react-native-feather";
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
+import LanguageButton from './common/LanguageButton';
 
-const Header = ({ showBack = false, showProfile = false }) => {
+// Header styles organized by section
+const styles = {
+  // Main container styles
+  container: {
+    base: [t.flexRow, t.itemsCenter, t.justifyBetween, t.pX4, t.pY2], // Flex layout with padding
+    dark: [t.bgGray900], // Dark theme background
+    light: [t.bgOrange200], // Light theme background
+  },
+  // Left section styles (back button and title)
+  leftSection: {
+    base: [t.flexRow, t.itemsCenter], // Flex layout for back button and title
+    backButton: [t.mR4], // Margin for back button
+    title: [t.flex1], // Take remaining space
+  },
+  // Right section styles (language and profile buttons)
+  rightSection: {
+    base: [t.flexRow, t.itemsCenter], // Flex layout for buttons
+    profileButton: [t.mL4], // Margin for profile button
+  },
+  // Text styles
+  text: {
+    back: [t.text2xl, t.textGray800], // Back arrow style
+    title: [t.textXl, t.fontBold, t.textGray800], // Title text style
+  },
+  // Profile image styles
+  profile: {
+    base: [t.w8, t.h8, t.roundedFull], // Circular profile image
+  }
+};
+
+const Header = ({ title, showBack = true, showProfile = true }) => {
   const navigation = useNavigation();
-  const { headerColor } = useTheme();
+  const { theme } = useTheme();
+
+  const headerColor = theme === 'dark' ? styles.container.dark : styles.container.light;
 
   return (
-    <View style={[
-      t.flexRow, 
-      t.justifyBetween, 
-      t.itemsCenter, 
-      t.wFull, 
-      t.pX4, 
-      t.pY3,
-      { backgroundColor: headerColor }
-    ]}>
-      <View style={[t.w10, t.h10, t.itemsCenter, t.justifyCenter]}>
+    <View style={[...styles.container.base, headerColor]}>
+      <View style={styles.leftSection.base}>
         {showBack && (
-          <TouchableOpacity 
+          <Pressable
             onPress={() => navigation.goBack()}
-            style={[t.itemsCenter, t.justifyCenter]}
+            style={styles.leftSection.backButton}
           >
-            <Icon.ArrowLeft width="24" height="24" stroke="white" />
-          </TouchableOpacity>
+            <Text style={styles.text.back}>←</Text>
+          </Pressable>
         )}
+        <View style={styles.leftSection.title}>
+          <Text style={styles.text.title}>{title}</Text>
+        </View>
       </View>
-
-      <View style={[t.flex1, t.itemsCenter]}>
-        {/* Add title or logo here if needed */}
-      </View>
-
-      <View style={[t.w10, t.h10, t.itemsCenter, t.justifyCenter]}>
+      <View style={styles.rightSection.base}>
+        <LanguageButton />
         {showProfile && (
-          <TouchableOpacity 
+          <Pressable
             onPress={() => navigation.navigate('Profile')}
-            style={[t.itemsCenter, t.justifyCenter]}
+            style={styles.rightSection.profileButton}
           >
-            <Image 
-              source={require('../assets/icon.png')}
-              style={[t.w10, t.h10, t.roundedFull]}
+            <Image
+              source={require('../assets/favicon.png')}
+              style={styles.profile.base}
             />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
     </View>

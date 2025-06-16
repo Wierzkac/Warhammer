@@ -1,48 +1,75 @@
-import React from 'react';
-import { ROUTES } from '../constants/constants';
-import useFetch from '../hooks/useFetch';
-import { fetchCareers, fetchTalents, fetchSkills } from '../services/api';
+import React, { useState, useEffect } from 'react';
+import { View } from 'react-native';
+import { useLanguage } from '../context/LanguageContext';
+import { careers, talents, skills } from '../services/api/endpoints';
 import ScreenLayout from '../components/common/ScreenLayout';
 import FeatureRow from '../components/FeatureRow';
+import ErrorMessage from '../components/common/ErrorMessage';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 
-const MainScreen = ({ navigation }) => {
-  const { data: careers, loading: careersLoading, error: careersError } = useFetch(fetchCareers);
-  const { data: talents, loading: talentsLoading, error: talentsError } = useFetch(fetchTalents);
-  const { data: skills, loading: skillsLoading, error: skillsError } = useFetch(fetchSkills);
+const MainScreen = () => {  
+  const { language } = useLanguage();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [data, setData] = useState({
+    careers: [],
+    talents: [],
+    skills: []
+  });
 
-  const loading = careersLoading || talentsLoading || skillsLoading;
-  const error = careersError || talentsError || skillsError;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [careersData, talentsData, skillsData] = await Promise.all([
+          careers.getAll(language),
+          talents.getAll(language),
+          skills.getAll(language)
+        ]);
+        
+        setData({
+          careers: careersData,
+          talents: talentsData,
+          skills: skillsData
+        });
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleSeeAll = (items, title) => {
-    navigation.navigate(ROUTES.ITEMS_LIST, { items, title });
-  };
+    fetchData();
+  }, [language]);
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message={error.message} />;
 
   return (
-    <ScreenLayout
-      showProfile={true}
-      loading={loading}
-      error={error}
-    >
-      {/* Careers Section */}
-      <FeatureRow
-        title="Careers"
-        description="Choose your path"
-        items={careers || []}
-      />
-
-      {/* Talents Section */}
-      <FeatureRow
-        title="Talents"
-        description="Discover your abilities"
-        items={talents || []}
-      />
-
-      {/* Skills Section */}
-      <FeatureRow
-        title="Skills"
-        description="Master your craft"
-        items={skills || []}
-      />
+    <ScreenLayout showProfile={true}>
+      <View style={{ flex: 1 }}>
+        {data.careers.length > 0 && (
+          <FeatureRow
+            title="Careers"
+            items={data.careers}
+            type="Career"
+          />
+        )}
+        {data.talents.length > 0 && (
+          <FeatureRow
+            title="Talents"
+            items={data.talents}
+            type="Talent"
+          />
+        )}
+        {data.skills.length > 0 && (
+          <FeatureRow
+            title="Skills"
+            items={data.skills}
+            type="Skill"
+          />
+        )}
+      </View>
     </ScreenLayout>
   );
 };

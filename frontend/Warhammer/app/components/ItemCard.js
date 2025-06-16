@@ -1,71 +1,82 @@
-import { View, Text, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
-import PropTypes from 'prop-types';
+import { View, Text, Image, Pressable, ImageBackground } from 'react-native';
 import { t } from 'react-native-tailwindcss';
-import { themeColors } from '../themes/themes';
 import { useNavigation } from '@react-navigation/native';
+import { careerImages } from '../constants/careerImages';
 
-const CardImage = ({ source }) => (
-  <Image 
-    style={[t.h50, t.w25, t.roundedTLg]} 
-    source={source}
-    resizeMode="cover"
-  />
-);
-
-CardImage.propTypes = {
-  source: PropTypes.any.isRequired
+// Item card styles organized by section
+const styles = {
+  // Card container styles
+  card: {
+    base: [
+      t.mR6, // Right margin
+      t.mB4, // Bottom margin
+      t.bgWhite, // White background
+      t.roundedLg, // Large border radius
+      t.overflowHidden, // Hide overflow content
+      t.shadowMd, // Medium shadow
+    ],
+  },
+  // Image styles
+  image: {
+    base: [
+      t.w40, // Fixed width
+      t.h60, // Fixed height
+    ],
+  },
+  // Content container styles
+  content: {
+    base: [t.p4], // Padding all around
+  },
+  // Text styles
+  text: {
+    title: [
+      t.textLg, // Large text size
+      t.fontBold, // Bold font weight
+      t.textGray800, // Dark gray text color
+    ],
+    description: [
+      t.textSm, // Small text size
+      t.textGray600, // Medium gray text color
+    ],
+  },
 };
 
-const CardContent = ({ name, description }) => (
-  <View style={[t.pX3, t.pB4, t.flex1, t.itemsCenter]}>
-    <Text style={[t.textLg, t.fontBold, t.pT2]}>{name}</Text>
-    {description && (
-      <Text style={[t.textSm, t.textGray600, t.mT1]} numberOfLines={2}>
-        {description}
-      </Text>
-    )}
-  </View>
-);
-
-CardContent.propTypes = {
-  name: PropTypes.string.isRequired,
-  description: PropTypes.string
-};
-
-export default function ItemCard({ item, type }) {
+const ItemCard = ({ item, type }) => {
   const navigation = useNavigation();
+  const isCareer = type === 'Career';
 
-  const handlePress = () => {
-    navigation.navigate('ItemDetails', {
-      item,
-      title: `${type} Details`
-    });
-  };
+  // Convert spaces to underscores for career image lookup
+  const careerImageKey = isCareer ? item.name.replace(/\s+/g, '_') : null;
 
   return (
-    <TouchableOpacity 
-      onPress={handlePress}
-      style={[
-        t.mR6, 
-        t.bgWhite, 
-        t.roundedL, 
-        t.shadowLg, 
-        {shadowColor: themeColors.bgColor(0.2), shadowRadius: 7}
-      ]}
+    <ImageBackground
+      source={require('../assets/background_light.png')}
+      style={styles.card.base}
     >
-      {item.image && <CardImage source={item.image} />}
-      <CardContent name={item.name} description={item.description} />
-    </TouchableOpacity>
+      <Pressable
+        onPress={() => navigation.navigate('ItemDetails', { item })}
+        style={[
+          t.flex1,
+          !isCareer && t.p4 // Add padding when not a career
+        ]}
+      >
+        {isCareer && careerImages[careerImageKey] && (
+          <Image
+            source={careerImages[careerImageKey]}
+            style={styles.image.base}
+            resizeMode="contain"
+          />
+        )}
+        <View style={[
+          styles.content.base,
+          !isCareer && t.p0 // Remove padding when not a career
+        ]}>
+          <Text style={styles.text.title}>{item.name}</Text>
+        </View>
+      </Pressable>
+    </ImageBackground>
   );
-}
+};
 
-ItemCard.propTypes = {
-  item: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    image: PropTypes.any
-  }).isRequired,
-  type: PropTypes.oneOf(['Career', 'Talent', 'Skill']).isRequired
-}; 
+export default ItemCard; 

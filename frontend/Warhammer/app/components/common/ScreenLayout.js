@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { t } from 'react-native-tailwindcss';
 import Header from '../Header';
@@ -10,6 +10,7 @@ const ScreenLayout = ({
   children, 
   showHeader = true, 
   showProfile = false,
+  showBack = false,
   loading = false,
   error = null,
   onRetry,
@@ -18,7 +19,7 @@ const ScreenLayout = ({
 }) => {
   const content = (
     <>
-      {showHeader && <Header showProfile={showProfile} />}
+      {showHeader && <Header showProfile={showProfile} showBack={showBack} />}
       {loading ? (
         <LoadingSpinner />
       ) : error ? (
@@ -30,18 +31,38 @@ const ScreenLayout = ({
   );
 
   return (
-    <SafeAreaView style={[t.flex1, t.bgGray50, ...style]}>
-      {scrollable ? (
-        <ScrollView 
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[t.flexGrow]}
-        >
-          {content}
-        </ScrollView>
-      ) : (
-        content
-      )}
-    </SafeAreaView>
+    <View style={{ flex: 1 }}>
+      <ImageBackground
+        source={require('../../assets/background.png')}
+        style={{ 
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          height: '100%'
+        }}
+        imageStyle={{ 
+          width: '100%',
+          height: '100%',
+          resizeMode: 'repeat'
+        }}
+      />
+      <SafeAreaView style={[t.flex1, ...style]}>
+        {scrollable ? (
+          <ScrollView 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[t.flexGrow]}
+            stickyHeaderIndices={[0]}
+          >
+            {content}
+          </ScrollView>
+        ) : (
+          content
+        )}
+      </SafeAreaView>
+    </View>
   );
 };
 

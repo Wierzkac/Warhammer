@@ -69,4 +69,14 @@ export const positive = (value) => {
     return 'Must be greater than 0';
   }
   return '';
+};
+
+export const url = (value) => {
+  if (!value) return '';
+  try {
+    new URL(value);
+    return '';
+  } catch {
+    return 'Must be a valid URL';
+  }
 }; 

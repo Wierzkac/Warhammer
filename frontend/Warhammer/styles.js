@@ -57,5 +57,6 @@ export const layout = {
     primary: [t.bgBlue500, t.pX4, t.pY2, t.roundedLg],
     secondary: [t.bgGray500, t.pX4, t.pY2, t.roundedLg],
     danger: [t.bgRed500, t.pX4, t.pY2, t.roundedLg],
+    icon: [t.bgTransparent, t.itemsCenter, t.justifyCenter],
   },
 }; 

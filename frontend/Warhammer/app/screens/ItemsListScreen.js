@@ -1,10 +1,10 @@
-import { View, Text, ScrollView, TextInput, Image, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, TextInput } from 'react-native'
 import React, { useState, useMemo } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { t } from 'react-native-tailwindcss';
-import Header from '../components/Header';
 import * as Icon from "react-native-feather";
 import { useNavigation } from '@react-navigation/native';
+import ItemCard from '../components/ItemCard'
+import ScreenLayout from '../components/common/ScreenLayout';
 
 const SearchBar = ({ value, onChangeText }) => (
   <View style={[t.flexRow, t.itemsCenter, t.bgGray100, t.roundedFull, t.pX4, t.mX4, t.mB4]}>
@@ -18,44 +18,20 @@ const SearchBar = ({ value, onChangeText }) => (
   </View>
 );
 
-const ItemCard = ({ item, onPress }) => (
-  <TouchableOpacity 
-    onPress={onPress}
-    style={[t.bgWhite, t.roundedLg, t.p4, t.mX4, t.mB4, t.shadowMd]}
-  >
-    <View style={[t.flexRow, t.itemsCenter]}>
-      <View style={[t.w16, t.h16, t.roundedLg, t.overflowHidden, t.mR4]}>
-        <Image 
-          source={item.image}
-          style={[t.wFull, t.hFull]}
-          resizeMode="cover"
-        />
-      </View>
-      <View style={[t.flex1]}>
-        <Text style={[t.textLg, t.fontBold]}>{item.name}</Text>
-        <Text style={[t.textGray500, t.textSm]}>{item.description}</Text>
-      </View>
-      <Icon.ChevronRight width="20" height="20" stroke="gray" />
-    </View>
-  </TouchableOpacity>
-);
-
 export default function ItemsListScreen({ route }) {
   const navigation = useNavigation();
   
-  // Add error handling for missing route params
   if (!route?.params?.items) {
     return (
-      <SafeAreaView style={[t.flex1, t.bgGray50]}>
-        <Header showBack={true} showProfile={true} />
+      <ScreenLayout showBack={true} showProfile={true}>
         <View style={[t.flex1, t.itemsCenter, t.justifyCenter]}>
           <Text style={[t.textGray500]}>No items to display</Text>
         </View>
-      </SafeAreaView>
+      </ScreenLayout>
     );
   }
 
-  const { title, items } = route.params;
+  const { title, items, type } = route.params;
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredItems = useMemo(() => {
@@ -75,32 +51,34 @@ export default function ItemsListScreen({ route }) {
   };
 
   return (
-    <SafeAreaView style={[t.flex1, t.bgGray50]}>
-      <Header showBack={true} showProfile={true} />
-      
-      <SearchBar 
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
-
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[t.pB4]}
-      >
-        {filteredItems.length === 0 ? (
-          <View style={[t.flex1, t.itemsCenter, t.justifyCenter, t.pT8]}>
-            <Text style={[t.textGray500]}>No items found</Text>
+    <ScreenLayout showProfile={true} showBack={true}>
+      <View style={[t.flex1, t.p4]}>
+        <SearchBar 
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <ScrollView 
+          style={[t.mt4]}
+          contentContainerStyle={[t.flexGrow, t.itemsCenter, t.pB4]}
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={true}
+          zoomScale={1}
+          maximumZoomScale={1}
+          minimumZoomScale={1}
+        >
+          <View style={[t.flexRow, t.flexWrap, t.justifyCenter, t.gap4]}>
+            {filteredItems.map((item, index) => (
+              <View key={`${item.id}-${index}`} style={[t.mB4]}>
+                <ItemCard 
+                  item={item} 
+                  type={type}
+                  onPress={() => handleItemPress(item)}
+                />
+              </View>
+            ))}
           </View>
-        ) : (
-          filteredItems.map((item, index) => (
-            <ItemCard 
-              key={`${item.id}-${index}`} 
-              item={item}
-              onPress={() => handleItemPress(item)}
-            />
-          ))
-        )}
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </View>
+    </ScreenLayout>
   );
 } 
