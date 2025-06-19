@@ -38,9 +38,9 @@ public class HalflingFactory extends RaceFactory {
             "race.halfling.history",
             "race.halfling.personality"
         );
-        halfling.setSkills(loadSkills(skillNames));
-        halfling.setTalents(loadTalents(talentNames));
-        halfling.setCharacteristicModifiers(loadCharacteristicModifiers());
+        halfling.setSkills(loadSkills(skillNames))
+            .setTalents(loadTalents(talentNames))
+            .setCharacteristicModifiers(loadCharacteristicModifiers());
         return halfling;
     }
 

@@ -31,10 +31,10 @@ public class AuthenticationService {
         }
 
         // Create new user
-        var user = new User();
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setNickname(request.getUsername());
+        var user = new User()
+            .setEmail(request.getEmail())
+            .setPassword(passwordEncoder.encode(request.getPassword()))
+            .setNickname(request.getUsername());
 
         // Save user to database
         userService.save(user);

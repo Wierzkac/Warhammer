@@ -37,9 +37,9 @@ public class ElfFactory extends RaceFactory {
             "race.elf.history",
             "race.elf.personality"
         );
-        elf.setSkills(loadSkills(skillNames));
-        elf.setTalents(loadTalents(talentNames));
-        elf.setCharacteristicModifiers(loadCharacteristicModifiers());
+        elf.setSkills(loadSkills(skillNames))
+            .setTalents(loadTalents(talentNames))
+            .setCharacteristicModifiers(loadCharacteristicModifiers());
         return elf;
     }
 

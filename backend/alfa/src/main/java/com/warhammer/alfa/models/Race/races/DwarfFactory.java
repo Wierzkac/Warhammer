@@ -41,9 +41,9 @@ public class DwarfFactory extends RaceFactory {
             "Dwarfs have a long and storied history in the Old World.",
             "Dwarfs are stubborn, honorable, and value tradition."
         );
-        dwarf.setSkills(loadSkills(skillNames));
-        dwarf.setTalents(loadTalents(talentNames));
-        dwarf.setCharacteristicModifiers(loadCharacteristicModifiers());
+        dwarf.setSkills(loadSkills(skillNames))
+            .setTalents(loadTalents(talentNames))
+            .setCharacteristicModifiers(loadCharacteristicModifiers());
         return dwarf;
     }
 

@@ -22,10 +22,10 @@ public class CharacterFactory {
     public Character createCharacter(String name, RaceEnum race, GenderEnum gender, 
                                   Career currentCareer, int woundsd10Roll, int fated10Roll) {
         Character character = new Character();
-        character.setName(name);
-        character.setRace(race);
-        character.setGender(gender);
-        character.setCurrentCareer(currentCareer);
+        character.setName(name)
+            .setRace(race)
+            .setGender(gender)
+            .setCurrentCareer(currentCareer);
 
         // Initialize characteristics from race modifiers
         character.getCharacteristics().putAll(raceService.getCharacteristicModifiers(race));

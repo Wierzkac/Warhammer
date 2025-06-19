@@ -34,9 +34,9 @@ public class HumanFactory extends RaceFactory {
             "race.human.history",
             "race.human.personality"
         );
-        human.setSkills(loadSkills(skillNames));
-        human.setTalents(loadTalents(talentNames));
-        human.setCharacteristicModifiers(loadCharacteristicModifiers());
+        human.setSkills(loadSkills(skillNames))
+            .setTalents(loadTalents(talentNames))
+            .setCharacteristicModifiers(loadCharacteristicModifiers());
         return human;
     }
 
