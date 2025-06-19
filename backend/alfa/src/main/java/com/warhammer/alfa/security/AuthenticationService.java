@@ -11,10 +11,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.warhammer.alfa.exceptions.UserAlreadyExistsException;
 import com.warhammer.alfa.exceptions.InternalServerErrorException;
+import com.warhammer.alfa.security.util.RsaDecryptionUtil;
+import java.security.PrivateKey;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+
+    private static final String PRIVATE_KEY_PATH = "backend/alfa/src/main/resources/private_key.pem";
+    
+    private final int BEARER_LENGTH = 7;
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -22,6 +28,13 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
 
     public AuthenticationResponse register(AuthenticationRequest request) {
+        String decryptedPassword;
+        try {
+            PrivateKey privateKey = RsaDecryptionUtil.loadPrivateKey(PRIVATE_KEY_PATH);
+            decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), privateKey);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Password decryption failed");
+        }
         // Check if user already exists
         if (userService.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistsException("User already exists with email: " + request.getEmail());
@@ -29,20 +42,16 @@ public class AuthenticationService {
         if (userService.existsByNickname(request.getUsername())) {
             throw new UserAlreadyExistsException("User already exists with nickname: " + request.getUsername());
         }
-
         // Create new user
         var user = new User()
             .setEmail(request.getEmail())
-            .setPassword(passwordEncoder.encode(request.getPassword()))
+            .setPassword(passwordEncoder.encode(decryptedPassword))
             .setNickname(request.getUsername());
-
         // Save user to database
         userService.save(user);
-
         // Generate tokens
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
-
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .refreshToken(refreshToken)
@@ -50,17 +59,19 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        String decryptedPassword;
+        try {
+            PrivateKey privateKey = RsaDecryptionUtil.loadPrivateKey(PRIVATE_KEY_PATH);
+            decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), privateKey);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Password decryption failed");
+        }
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getEmail(),
-                request.getPassword()
-            )
+            new UsernamePasswordAuthenticationToken(request.getEmail(), decryptedPassword)
         );
-        
         var user = userService.findByEmail(request.getEmail());
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
-        
         return AuthenticationResponse.builder()
             .token(jwtToken)
             .refreshToken(refreshToken)
@@ -68,7 +79,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse refreshToken(String refreshToken) {
-        String token = refreshToken.substring(7); // Remove "Bearer " prefix
+        String token = refreshToken.substring(BEARER_LENGTH); // Remove "Bearer " prefix
         String userEmail = jwtService.extractUsername(token);
         
         if (userEmail != null) {
