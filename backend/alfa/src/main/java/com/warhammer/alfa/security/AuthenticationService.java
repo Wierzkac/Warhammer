@@ -9,6 +9,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.warhammer.alfa.exceptions.UserAlreadyExistsException;
+import com.warhammer.alfa.exceptions.InternalServerErrorException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +24,10 @@ public class AuthenticationService {
     public AuthenticationResponse register(AuthenticationRequest request) {
         // Check if user already exists
         if (userService.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("User already exists with email: " + request.getEmail());
+            throw new UserAlreadyExistsException("User already exists with email: " + request.getEmail());
         }
         if (userService.existsByNickname(request.getUsername())) {
-            throw new RuntimeException("User already exists with nickname: " + request.getUsername());
+            throw new UserAlreadyExistsException("User already exists with nickname: " + request.getUsername());
         }
 
         // Create new user
@@ -83,6 +85,6 @@ public class AuthenticationService {
             }
         }
         
-        throw new RuntimeException("Invalid refresh token");
+        throw new InternalServerErrorException("Invalid refresh token");
     }
 } 
