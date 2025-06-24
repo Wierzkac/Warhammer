@@ -2,6 +2,8 @@ package com.warhammer.alfa.security;
 
 import com.warhammer.alfa.security.dto.AuthenticationRequest;
 import com.warhammer.alfa.security.dto.AuthenticationResponse;
+import com.warhammer.alfa.security.dto.RefreshTokenRequest;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,9 +33,9 @@ public class AuthController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthenticationResponse> refreshToken(
-            @RequestHeader("Authorization") String refreshToken
+            @Valid @RequestBody RefreshTokenRequest request
     ) {
-        return ResponseEntity.ok(authenticationService.refreshToken(refreshToken));
+        return ResponseEntity.ok(authenticationService.refreshToken(request.getRefreshToken()));
     }
 
     @PostMapping("/logout")
@@ -41,4 +43,4 @@ public class AuthController {
         // The actual logout is handled by Spring Security
         return ResponseEntity.ok().build();
     }
-} 
+}
