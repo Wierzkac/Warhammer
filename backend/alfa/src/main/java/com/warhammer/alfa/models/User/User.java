@@ -38,7 +38,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private RoleEnum role = RoleEnum.USER;
 
-    private boolean enabled = true;
+    private boolean enabled = false;
+
     private boolean accountNonExpired = true;
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;

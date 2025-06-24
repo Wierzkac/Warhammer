@@ -13,6 +13,7 @@ import com.warhammer.alfa.exceptions.UserAlreadyExistsException;
 import com.warhammer.alfa.exceptions.InternalServerErrorException;
 import com.warhammer.alfa.security.util.RsaDecryptionUtil;
 import java.security.PrivateKey;
+import com.warhammer.alfa.email.EmailConfirmationService;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailConfirmationService emailConfirmationService;
 
     public AuthenticationResponse register(AuthenticationRequest request) {
         String decryptedPassword;
@@ -49,6 +51,10 @@ public class AuthenticationService {
             .setNickname(request.getUsername());
         // Save user to database
         userService.save(user);
+
+        // Send confirmation email
+        emailConfirmationService.sendConfirmationEmail(user);
+
         // Generate tokens
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
