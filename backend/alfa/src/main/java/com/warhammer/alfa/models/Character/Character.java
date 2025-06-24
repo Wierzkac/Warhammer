@@ -6,6 +6,7 @@ import com.warhammer.alfa.enums.CharacteristicEnum;
 import com.warhammer.alfa.enums.GenderEnum;
 import com.warhammer.alfa.enums.RaceEnum;
 import com.warhammer.alfa.models.Career.Career;
+import com.warhammer.alfa.models.Item.Item;
 import com.warhammer.alfa.models.Skill.Skill;
 import com.warhammer.alfa.models.Talent.Talent;
 import com.warhammer.alfa.models.User.User;
@@ -63,4 +64,10 @@ public class Character {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(name = "experience_points_free")
+    private int experencePointsFree;
+
+    @Column(name = "experience_points_total")
+    private int experencePointsTotal;
 }
