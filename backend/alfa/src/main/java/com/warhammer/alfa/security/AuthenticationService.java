@@ -16,6 +16,7 @@ import com.warhammer.alfa.exceptions.InternalServerErrorException;
 import com.warhammer.alfa.security.util.RsaDecryptionUtil;
 import java.security.PrivateKey;
 import com.warhammer.alfa.email.EmailConfirmationService;
+import com.warhammer.alfa.consts.ApplicationConsts;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +25,6 @@ public class AuthenticationService {
     @Value("${application.security.private-key}")
     private final PrivateKey PRIVATE_KEY;
     
-    private final int BEARER_LENGTH = 7;
-
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserService userService;
@@ -86,7 +85,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse refreshToken(String refreshToken) {
-        String token = refreshToken.substring(BEARER_LENGTH); // Remove "Bearer " prefix
+        String token = refreshToken.substring(ApplicationConsts.BEARER_LENGTH); // Remove "Bearer " prefix
         String userEmail = jwtService.extractUsername(token);
         
         if (userEmail != null) {
