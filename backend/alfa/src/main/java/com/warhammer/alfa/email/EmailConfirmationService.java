@@ -3,6 +3,8 @@ package com.warhammer.alfa.email;
 import com.warhammer.alfa.models.User.User;
 import com.warhammer.alfa.models.User.UserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,7 +15,8 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class EmailConfirmationService {
 
-    private final int expiryHours = 2;
+    @Value("${application.email.expiry-minutes}")
+    private final int expiryMinutes;
     
     private final UserService userService;
     private final EmailService emailService;
@@ -52,7 +55,7 @@ public class EmailConfirmationService {
     
     private String generateConfirmationToken(String email) {
         String uuid = UUID.randomUUID().toString();
-        LocalDateTime expiry = LocalDateTime.now().plusHours(expiryHours);
+        LocalDateTime expiry = LocalDateTime.now().plusMinutes(expiryMinutes);
         String tokenData = email + "|" + uuid + "|" + expiry.toString();
         return Base64.getEncoder().encodeToString(tokenData.getBytes());
     }

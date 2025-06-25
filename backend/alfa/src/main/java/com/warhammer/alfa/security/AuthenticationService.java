@@ -5,6 +5,8 @@ import com.warhammer.alfa.security.dto.AuthenticationResponse;
 import com.warhammer.alfa.models.User.User;
 import com.warhammer.alfa.models.User.UserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +21,8 @@ import com.warhammer.alfa.email.EmailConfirmationService;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private static final String PRIVATE_KEY_PATH = "backend/alfa/src/main/resources/private_key.pem";
+    @Value("${application.security.private-key}")
+    private final PrivateKey PRIVATE_KEY;
     
     private final int BEARER_LENGTH = 7;
 
@@ -32,8 +35,7 @@ public class AuthenticationService {
     public AuthenticationResponse register(AuthenticationRequest request) {
         String decryptedPassword;
         try {
-            PrivateKey privateKey = RsaDecryptionUtil.loadPrivateKey(PRIVATE_KEY_PATH);
-            decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), privateKey);
+            decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), PRIVATE_KEY);
         } catch (Exception e) {
             throw new InternalServerErrorException("Password decryption failed");
         }
@@ -67,8 +69,7 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         String decryptedPassword;
         try {
-            PrivateKey privateKey = RsaDecryptionUtil.loadPrivateKey(PRIVATE_KEY_PATH);
-            decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), privateKey);
+            decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), PRIVATE_KEY);
         } catch (Exception e) {
             throw new InternalServerErrorException("Password decryption failed");
         }
