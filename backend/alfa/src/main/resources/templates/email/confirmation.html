@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Confirmation</title>
+    <style>
+        body {
+            background: #f4f4f7;
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background: #fff;
+            max-width: 480px;
+            margin: 40px auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 32px 24px;
+        }
+        h2 {
+            color: #2d3748;
+            margin-top: 0;
+        }
+        p {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        .button {
+            display: inline-block;
+            margin: 24px 0 16px 0;
+            padding: 12px 32px;
+            background: #4f8cff;
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 1px 4px rgba(79,140,255,0.12);
+            transition: background 0.2s;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .footer {
+            margin-top: 32px;
+            font-size: 12px;
+            color: #a0aec0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome, <span th:text="${username}">User</span>!</h2>
+        <p>Thank you for registering for Warhammer. Please confirm your email address to activate your account.</p>
+        <a class="button" th:href="${confirmationUrl}">Confirm Email</a>
+        <p style="margin-top: 24px;">This link will expire in <span th:text="${expiryMinutes}">120</span> minutes.</p>
+        <div class="footer">
+            If you did not create a Warhammer account, you can safely ignore this email.<br>
+            &copy; 2024 Warhammer
+        </div>
+    </div>
+</body>
+</html> 
