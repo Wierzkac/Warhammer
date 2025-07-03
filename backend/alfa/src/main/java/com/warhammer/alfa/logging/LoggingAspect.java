@@ -1,4 +1,4 @@
-package com.warhammer.alfa.aop;
+package com.warhammer.alfa.logging;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

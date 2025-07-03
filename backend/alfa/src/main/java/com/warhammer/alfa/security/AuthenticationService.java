@@ -4,9 +4,7 @@ import com.warhammer.alfa.security.dto.AuthenticationRequest;
 import com.warhammer.alfa.security.dto.AuthenticationResponse;
 import com.warhammer.alfa.models.User.User;
 import com.warhammer.alfa.models.User.UserService;
-import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,22 +17,34 @@ import com.warhammer.alfa.email.EmailConfirmationService;
 import com.warhammer.alfa.consts.ApplicationConsts;
 
 @Service
-@RequiredArgsConstructor
 public class AuthenticationService {
 
-    @Value("${application.security.private-key}")
-    private final PrivateKey PRIVATE_KEY;
-    
+    private final PrivateKey privateKey;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final EmailConfirmationService emailConfirmationService;
+    
+    public AuthenticationService(
+            PrivateKey privateKey,
+            AuthenticationManager authenticationManager,
+            JwtService jwtService,
+            UserService userService,
+            PasswordEncoder passwordEncoder,
+            EmailConfirmationService emailConfirmationService) {
+        this.privateKey = privateKey;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.emailConfirmationService = emailConfirmationService;
+    }
 
     public AuthenticationResponse register(AuthenticationRequest request) {
         String decryptedPassword;
         try {
-            decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), PRIVATE_KEY);
+            decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), privateKey);
         } catch (Exception e) {
             throw new InternalServerErrorException("Password decryption failed");
         }
@@ -68,7 +78,7 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         String decryptedPassword;
         try {
-            decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), PRIVATE_KEY);
+            decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), privateKey);
         } catch (Exception e) {
             throw new InternalServerErrorException("Password decryption failed");
         }

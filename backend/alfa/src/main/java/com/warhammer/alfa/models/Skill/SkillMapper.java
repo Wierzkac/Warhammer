@@ -9,7 +9,6 @@ import com.warhammer.alfa.models.Talent.Talent;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.Set;
 
 @Mapper(componentModel = "spring")
@@ -25,7 +24,7 @@ public interface SkillMapper {
     @Named("talentsToMap")
     static List<Map<String, Object>> talentsToMap(Set<Talent> talents) {
         if (talents == null) {
-            return new ArrayList<>();
+            return List.of();
         }
         
         return talents.stream().map(talent -> {

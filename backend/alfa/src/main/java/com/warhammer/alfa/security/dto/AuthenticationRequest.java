@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import com.warhammer.alfa.security.dto.AtLeastOneOfUsernameOrEmail;
 
 @Data
 @Builder

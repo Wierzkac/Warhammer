@@ -6,7 +6,6 @@ import com.warhammer.alfa.enums.CharacteristicEnum;
 import com.warhammer.alfa.enums.GenderEnum;
 import com.warhammer.alfa.enums.RaceEnum;
 import com.warhammer.alfa.models.Career.Career;
-import com.warhammer.alfa.models.Item.Item;
 import com.warhammer.alfa.models.Skill.Skill;
 import com.warhammer.alfa.models.Talent.Talent;
 import com.warhammer.alfa.models.User.User;

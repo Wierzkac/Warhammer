@@ -7,7 +7,6 @@ import org.mapstruct.Named;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.Set;
 
 @Mapper(componentModel = "spring")
@@ -23,7 +22,7 @@ public interface CareerMapper {
     @Named("careerEntriesToMap")
     static List<Map<String, Object>> careerEntriesToMap(Set<Career> entries) {
         if (entries == null) {
-            return new ArrayList<>();
+            return List.of();
         }
         
         return entries.stream().map(entry -> {
@@ -37,7 +36,7 @@ public interface CareerMapper {
     @Named("careerExitsToMap")
     static List<Map<String, Object>> careerExitsToMap(Set<Career> exits) {
         if (exits == null) {
-            return new ArrayList<>();
+            return List.of();
         }
         
         return exits.stream().map(exit -> {

@@ -4,9 +4,7 @@ import com.warhammer.alfa.enums.CharacteristicEnum;
 import com.warhammer.alfa.enums.RaceEnum;
 import com.warhammer.alfa.models.Race.Race;
 import com.warhammer.alfa.models.Race.RaceFactory;
-import com.warhammer.alfa.models.Skill.Skill;
 import com.warhammer.alfa.models.Skill.SkillRepository;
-import com.warhammer.alfa.models.Talent.Talent;
 import com.warhammer.alfa.models.Talent.TalentRepository;
 import org.springframework.stereotype.Component;
 

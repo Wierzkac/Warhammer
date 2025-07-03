@@ -4,25 +4,20 @@ import com.warhammer.alfa.enums.GenderEnum;
 import com.warhammer.alfa.enums.RaceEnum;
 import com.warhammer.alfa.models.Career.Career;
 import com.warhammer.alfa.models.Dice;
-import com.warhammer.alfa.models.Race.Race;
-import com.warhammer.alfa.models.Race.RaceFactoryProvider;
 import com.warhammer.alfa.util_tables.StartingCareerTable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CharacterService {
     private final CharacterFactory characterFactory;
-    private final RaceFactoryProvider raceFactoryProvider;
     private final CharacterMapper characterMapper;
     private final StartingCareerTable startingCareerTable;
 
     public CharacterService(
             CharacterFactory characterFactory,
-            RaceFactoryProvider raceFactoryProvider,
             CharacterMapper characterMapper,
             StartingCareerTable startingCareerTable) {
         this.characterFactory = characterFactory;
-        this.raceFactoryProvider = raceFactoryProvider;
         this.characterMapper = characterMapper;
         this.startingCareerTable = startingCareerTable; 
     }
