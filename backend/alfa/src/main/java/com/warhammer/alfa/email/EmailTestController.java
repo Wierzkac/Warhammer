@@ -15,7 +15,7 @@ public class EmailTestController {
     }
 
     @GetMapping("/{email}")
-    public String sendTestEmail(@PathVariable String email) {
+    public String setUpdatedAt(@PathVariable("email") String email) {
         
         User user = new User();
         user.setEmail(email);
