@@ -1,6 +1,26 @@
 version: '3.8'
 
 services:
+  alfa:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: warhammer-alfa
+    ports:
+      - "8080:8080"
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_DATABASE=Warhammer
+      - MYSQL_USER=WarhammerAdmin
+      - MYSQL_PASSWORD=*k]U4_@75E?4N>2mV:_0*7
+      - SPRING_PROFILES_ACTIVE=docker
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    depends_on:
+      - db
+    networks:
+      - warhammer_network
+    restart: unless-stopped
+
   db:
     image: mysql:8.0
     restart: always
@@ -34,6 +54,9 @@ services:
       - '--web.enable-lifecycle'
     networks:
       - warhammer_network
+    depends_on:
+      - alfa
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:latest
@@ -49,6 +72,28 @@ services:
       - prometheus
     networks:
       - warhammer_network
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:2.9.4
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - warhammer_network
+
+  promtail:
+    image: grafana/promtail:2.9.4
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log:/var/log:ro
+      - ./promtail-config.yaml:/etc/promtail/config.yaml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yaml
+    networks:
+      - warhammer_network
+    depends_on:
+      - loki
 
 volumes:
   my-db:
@@ -56,3 +101,4 @@ volumes:
 
 networks:
   warhammer_network:
+    driver: bridge

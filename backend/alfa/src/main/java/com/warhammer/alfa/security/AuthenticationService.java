@@ -1,10 +1,13 @@
 package com.warhammer.alfa.security;
 
+import com.warhammer.alfa.metrics.MetricsService;
 import com.warhammer.alfa.security.dto.AuthenticationRequest;
 import com.warhammer.alfa.security.dto.AuthenticationResponse;
 import com.warhammer.alfa.models.User.User;
 import com.warhammer.alfa.models.User.UserService;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,8 +18,11 @@ import com.warhammer.alfa.security.util.RsaDecryptionUtil;
 import java.security.PrivateKey;
 import com.warhammer.alfa.email.EmailConfirmationService;
 import com.warhammer.alfa.consts.ApplicationConsts;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.annotation.Counted;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService {
 
     private final PrivateKey privateKey;
@@ -25,41 +31,36 @@ public class AuthenticationService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final EmailConfirmationService emailConfirmationService;
-    
-    public AuthenticationService(
-            PrivateKey privateKey,
-            AuthenticationManager authenticationManager,
-            JwtService jwtService,
-            UserService userService,
-            PasswordEncoder passwordEncoder,
-            EmailConfirmationService emailConfirmationService) {
-        this.privateKey = privateKey;
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.emailConfirmationService = emailConfirmationService;
-    }
+    private final MetricsService metricsService;
 
+
+    @Timed(value = "user.registration.duration", description = "Time taken to register a user")
+    @Counted(value = "user.registration.success", description = "Total registration attempts ended in success")
     public AuthenticationResponse register(AuthenticationRequest request) {
         String decryptedPassword;
         try {
             decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), privateKey);
         } catch (Exception e) {
+            metricsService.incrementUserRegistrations();
             throw new InternalServerErrorException("Password decryption failed");
         }
+        
         // Check if user already exists
         if (userService.existsByEmail(request.getEmail())) {
+            metricsService.incrementUserRegistrations();
             throw new UserAlreadyExistsException("User already exists with email: " + request.getEmail());
         }
         if (userService.existsByNickname(request.getUsername())) {
+            metricsService.incrementUserRegistrations();
             throw new UserAlreadyExistsException("User already exists with nickname: " + request.getUsername());
         }
+        
         // Create new user
         var user = new User()
             .setEmail(request.getEmail())
             .setPassword(passwordEncoder.encode(decryptedPassword))
             .setNickname(request.getUsername());
+
         // Save user to database
         userService.save(user);
 
@@ -75,17 +76,22 @@ public class AuthenticationService {
                 .build();
     }
 
+    @Timed(value = "user.login.duration", description = "Time taken to authenticate a user")
+    @Counted(value = "user.login.attempts", description = "Total login attempts")
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         String decryptedPassword;
         try {
             decryptedPassword = RsaDecryptionUtil.decrypt(request.getPassword(), privateKey);
         } catch (Exception e) {
+            metricsService.incrementUserLogins();
             throw new InternalServerErrorException("Password decryption failed");
         }
+        
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getEmail(), decryptedPassword)
         );
         var user = userService.findByEmail(request.getEmail());
+        
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         return AuthenticationResponse.builder()
@@ -94,6 +100,7 @@ public class AuthenticationService {
             .build();
     }
 
+    @Timed(value = "token.refresh.duration", description = "Time taken to refresh a token")
     public AuthenticationResponse refreshToken(String refreshToken) {
         String token = refreshToken.substring(ApplicationConsts.BEARER_LENGTH); // Remove "Bearer " prefix
         String userEmail = jwtService.extractUsername(token);
@@ -111,7 +118,7 @@ public class AuthenticationService {
                     .build();
             }
         }
-        
+
         throw new InternalServerErrorException("Invalid refresh token");
     }
 } 

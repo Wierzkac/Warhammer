@@ -6,15 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import io.micrometer.core.annotation.Timed;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.List;
-import io.micrometer.core.instrument.Timer;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +22,6 @@ public class EmailService {
     
     private final JavaMailSender mailSender;
     private final EmailRepository emailRepository;
-    private final MetricsService metricsService;
 
     /**
      * Save an email to the database for later sending.
@@ -31,7 +29,6 @@ public class EmailService {
      * @param subject the subject of the email
      * @param content the email body (plain text or HTML)
      */
-    @Async
     public void sendEmail(String recipient, String subject, String content) {
         EmailEntity email = new EmailEntity()
             .setRecipient(recipient)
@@ -40,7 +37,7 @@ public class EmailService {
             .setStatus("TO_BE_SENT")
             .setCreatedAt(LocalDateTime.now())
             .setUpdatedAt(LocalDateTime.now());
-        
+
         emailRepository.save(email);
         log.info("Email saved to database for recipient: {}", recipient);
     }
@@ -48,48 +45,42 @@ public class EmailService {
     /**
      * Send a single email from the database.
      */
+    @Timed(value = "email.sending.duration", description = "Time taken to send an email")
     private void sendEmailFromDatabase(EmailEntity email) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
         helper.setTo(email.getRecipient());
         helper.setSubject(email.getSubject());
-        
+
         // Check if content looks like HTML and set content type accordingly
         boolean isHtml = email.getContent().contains("<html") || email.getContent().contains("<body");
         helper.setText(email.getContent(), isHtml);
-        
+
         mailSender.send(mimeMessage);
     }
 
-    
-    @Scheduled(cron = "*/1 * * * *")
+    @Scheduled(cron = "0 */5 * * * *")
     public void sendPendingEmails() {
         log.info("Starting scheduled email sending job");
-        try {   
-    
+        try {
             List<EmailEntity> pendingEmails = emailRepository.findByStatus("TO_BE_SENT");
-            
+
             if (pendingEmails.isEmpty()) {
                 log.debug("No pending emails to send");
                 return;
             }
-            
+
             log.info("Found {} pending emails to send", pendingEmails.size());
-            
+
             for (EmailEntity email : pendingEmails) {
-                Timer.Sample timer = metricsService.startEmailSendingTimer();
                 try {
                     sendEmailFromDatabase(email);
                     email.setStatus("SENT");
                     email.setUpdatedAt(LocalDateTime.now());
                     emailRepository.save(email);
-                    metricsService.incrementEmailsSent();
                     log.info("Email sent successfully to: {}", email.getRecipient());
                 } catch (Exception e) {
-                    metricsService.incrementEmailsFailed();
                     log.error("Failed to send email to {}: {}", email.getRecipient(), e.getMessage());
-                } finally {
-                    metricsService.stopEmailSendingTimer(timer);
                 }
             }
             log.info("Scheduled email sending job completed");
@@ -97,4 +88,4 @@ public class EmailService {
             log.error("Error during scheduled email sending: {}", e.getMessage(), e);
         }
     }
-} 
+}
