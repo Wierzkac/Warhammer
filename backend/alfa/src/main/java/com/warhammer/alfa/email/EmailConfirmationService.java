@@ -6,7 +6,6 @@ import com.warhammer.alfa.models.User.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,7 +18,6 @@ public class EmailConfirmationService {
     private final String emailURL;
     private final UserService userService;
     private final EmailService emailService;
-    private final TemplateEngine templateEngine;
 
     public EmailConfirmationService(
             @Value("${application.email.expiry-minutes}") int expiryMinutes,
@@ -31,7 +29,6 @@ public class EmailConfirmationService {
         this.emailURL = emailURL;
         this.userService = userService;
         this.emailService = emailService;
-        this.templateEngine = templateEngine;
     }
     
     
@@ -39,14 +36,12 @@ public class EmailConfirmationService {
         String token = generateConfirmationToken(user.getEmail());
         String confirmationUrl = emailURL + "/confirm-email?token=" + token;
         
-        // Use Thymeleaf template to generate HTML email
-        Context context = new Context();
-        context.setVariable("username", user.getNickname());
-        context.setVariable("confirmationUrl", confirmationUrl);
-        context.setVariable("expiryMinutes", expiryMinutes);
+        java.util.Map<String, String> arguments = new java.util.HashMap<>();
+        arguments.put("username", user.getNickname());
+        arguments.put("confirmationUrl", confirmationUrl);
+        arguments.put("expiryMinutes", String.valueOf(expiryMinutes));
         
-        String htmlContent = templateEngine.process("email/confirmation", context);
-        emailService.sendEmail(user.getEmail(), "Confirm your Warhammer account", htmlContent);
+        emailService.saveEmail(user.getEmail(), "Confirm your Warhammer account", com.warhammer.alfa.enums.EmailTypeEnum.CONFIRM_REGISTRATION, arguments);
     }
     
     public boolean confirmEmail(String token) {

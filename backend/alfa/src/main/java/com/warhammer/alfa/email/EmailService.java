@@ -1,6 +1,6 @@
 package com.warhammer.alfa.email;
 
-import com.warhammer.alfa.metrics.MetricsService;
+import com.warhammer.alfa.enums.EmailStatusEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,6 +14,10 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.warhammer.alfa.enums.EmailTypeEnum;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,24 +26,57 @@ public class EmailService {
     
     private final JavaMailSender mailSender;
     private final EmailRepository emailRepository;
+    private final TemplateEngine templateEngine;
 
     /**
      * Save an email to the database for later sending.
      * @param recipient the recipient's email address
      * @param subject the subject of the email
-     * @param content the email body (plain text or HTML)
+     * @param emailType the type of email to send
+     * @param arguments the arguments to include in the email (e.g., username, link)
      */
-    public void sendEmail(String recipient, String subject, String content) {
+    public void saveEmail(String recipient, String subject, EmailTypeEnum emailType, java.util.Map<String, String> arguments) {
         EmailEntity email = new EmailEntity()
             .setRecipient(recipient)
             .setSubject(subject)
-            .setContent(content)
-            .setStatus("TO_BE_SENT")
+            .setStatus(EmailStatusEnum.PENDING)
+            .setEmailType(emailType)
+            .setArguments(arguments)
             .setCreatedAt(LocalDateTime.now())
             .setUpdatedAt(LocalDateTime.now());
-
         emailRepository.save(email);
         log.info("Email saved to database for recipient: {}", recipient);
+    }
+
+    @Scheduled(cron = "0 */5 * * * *")
+    @Transactional
+    public void sendPendingEmails() {
+        log.info("Starting scheduled email sending job");
+        try {
+            List<EmailEntity> pendingEmails = emailRepository.findByStatusForUpdate(EmailStatusEnum.PENDING);
+
+            if (pendingEmails.isEmpty()) {
+                log.debug("No pending emails to send");
+                return;
+            }
+
+            log.info("Found {} pending emails to send", pendingEmails.size());
+
+            for (EmailEntity email : pendingEmails) {
+                try {
+                    sendEmailFromDatabase(email);
+                    email.setStatus(EmailStatusEnum.SENT);
+                    email.setUpdatedAt(LocalDateTime.now());
+                    emailRepository.save(email);
+                    log.info("Email sent successfully to: {}", email.getRecipient());
+                } catch (Exception e) {
+                    log.error("Failed to send email to {}: {}", email.getRecipient(), e.getMessage());
+                }
+            }
+            log.info("Scheduled email sending job completed");
+        } catch (Exception e) {
+            log.error("Error during scheduled email sending: {}", e.getMessage(), e);
+        }
     }
 
     /**
@@ -52,40 +89,34 @@ public class EmailService {
         helper.setTo(email.getRecipient());
         helper.setSubject(email.getSubject());
 
-        // Check if content looks like HTML and set content type accordingly
-        boolean isHtml = email.getContent().contains("<html") || email.getContent().contains("<body");
-        helper.setText(email.getContent(), isHtml);
+        String content = generateEmailContent(email);
+        boolean isHtml = content.contains("<html") || content.contains("<body");
+        helper.setText(content, isHtml);
 
         mailSender.send(mimeMessage);
     }
 
-    @Scheduled(cron = "0 */5 * * * *")
-    public void sendPendingEmails() {
-        log.info("Starting scheduled email sending job");
-        try {
-            List<EmailEntity> pendingEmails = emailRepository.findByStatus("TO_BE_SENT");
-
-            if (pendingEmails.isEmpty()) {
-                log.debug("No pending emails to send");
-                return;
+    /**
+     * Generate email content based on type and arguments using Thymeleaf.
+     */
+    private String generateEmailContent(EmailEntity email) {
+        Context context = new Context();
+        if (email.getArguments() != null) {
+            for (java.util.Map.Entry<String, String> entry : email.getArguments().entrySet()) {
+                context.setVariable(entry.getKey(), entry.getValue());
             }
-
-            log.info("Found {} pending emails to send", pendingEmails.size());
-
-            for (EmailEntity email : pendingEmails) {
-                try {
-                    sendEmailFromDatabase(email);
-                    email.setStatus("SENT");
-                    email.setUpdatedAt(LocalDateTime.now());
-                    emailRepository.save(email);
-                    log.info("Email sent successfully to: {}", email.getRecipient());
-                } catch (Exception e) {
-                    log.error("Failed to send email to {}: {}", email.getRecipient(), e.getMessage());
-                }
-            }
-            log.info("Scheduled email sending job completed");
-        } catch (Exception e) {
-            log.error("Error during scheduled email sending: {}", e.getMessage(), e);
         }
+        String templateName;
+        switch (email.getEmailType()) {
+            case CONFIRM_REGISTRATION:
+                templateName = "email/confirmation";
+                break;
+            case PASSWORD_RESET:
+                templateName = "email/password_reset";
+                break;
+            default:
+                templateName = "email/default";
+        }
+        return templateEngine.process(templateName, context);
     }
 }
