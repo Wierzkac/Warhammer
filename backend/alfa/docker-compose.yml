@@ -81,6 +81,7 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - warhammer_network
+    restart: unless-stopped
 
   promtail:
     image: grafana/promtail:2.9.4
@@ -94,6 +95,7 @@ services:
       - warhammer_network
     depends_on:
       - loki
+    restart: unless-stopped
 
 volumes:
   my-db:
