@@ -1,6 +1,8 @@
 package com.warhammer.alfa.email;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -44,7 +46,8 @@ public class EmailEntity {
     @CollectionTable(name = "email_arguments", joinColumns = @JoinColumn(name = "email_id"))
     @MapKeyColumn(name = "argument_key")
     @Column(name = "argument_value")
-    protected java.util.Map<String, String> arguments = new java.util.HashMap<>();
+    protected Map<String, String> arguments = new HashMap<>();
+    //protected EmailArguments arguments;
     
     @Column(nullable = false)
     protected LocalDateTime createdAt;

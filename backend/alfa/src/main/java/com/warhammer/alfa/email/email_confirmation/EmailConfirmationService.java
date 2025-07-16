@@ -1,5 +1,7 @@
-package com.warhammer.alfa.email;
+package com.warhammer.alfa.email.email_confirmation;
 
+import com.warhammer.alfa.email.EmailService;
+import com.warhammer.alfa.enums.EmailTypeEnum;
 import com.warhammer.alfa.models.User.User;
 import com.warhammer.alfa.models.User.UserService;
 
@@ -10,6 +12,8 @@ import org.thymeleaf.TemplateEngine;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class EmailConfirmationService {
@@ -31,17 +35,25 @@ public class EmailConfirmationService {
         this.emailService = emailService;
     }
     
-    
     public void sendConfirmationEmail(User user) {
         String token = generateConfirmationToken(user.getEmail());
-        String confirmationUrl = emailURL + "/confirm-email?token=" + token;
+        String confirmationUrl = emailURL + "/email/confirm?token=" + token;
+        //EmailArguments arguments = new EmailConfirmationArguments(user.getNickname(), confirmationUrl, expiryMinutes);
         
-        java.util.Map<String, String> arguments = new java.util.HashMap<>();
+        Map<String, String> arguments = new HashMap<>();
         arguments.put("username", user.getNickname());
         arguments.put("confirmationUrl", confirmationUrl);
         arguments.put("expiryMinutes", String.valueOf(expiryMinutes));
-        
-        emailService.saveEmail(user.getEmail(), "Confirm your Warhammer account", com.warhammer.alfa.enums.EmailTypeEnum.CONFIRM_REGISTRATION, arguments);
+
+        emailService.saveEmail(user.getEmail(), "Confirm your Warhammer account", EmailTypeEnum.CONFIRM_REGISTRATION, arguments);
+    }
+    
+    public void resendConfirmationEmail(String email) {
+        User user = userService.findByLogin(email);
+        if (user.isEnabled()) {
+            throw new RuntimeException("User account is already confirmed");
+        }
+        sendConfirmationEmail(user);
     }
     
     public boolean confirmEmail(String token) {
@@ -61,7 +73,7 @@ public class EmailConfirmationService {
                 return false; // Token expired
             }
             
-            User user = userService.findByEmail(email);
+            User user = userService.findByLogin(email);
             user.setEnabled(true);
             userService.save(user);
             
