@@ -40,7 +40,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
-        // The actual logout is handled by Spring Security
         return ResponseEntity.ok().build();
     }
 }

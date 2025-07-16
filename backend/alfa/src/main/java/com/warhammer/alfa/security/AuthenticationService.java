@@ -6,7 +6,6 @@ import com.warhammer.alfa.security.dto.AuthenticationResponse;
 import com.warhammer.alfa.models.User.User;
 import com.warhammer.alfa.models.User.UserService;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,8 +15,11 @@ import com.warhammer.alfa.exceptions.UserAlreadyExistsException;
 import com.warhammer.alfa.exceptions.InternalServerErrorException;
 import com.warhammer.alfa.security.util.RsaDecryptionUtil;
 import java.security.PrivateKey;
-import com.warhammer.alfa.email.EmailConfirmationService;
+import java.util.Objects;
+
 import com.warhammer.alfa.consts.ApplicationConsts;
+import com.warhammer.alfa.email.email_confirmation.EmailConfirmationService;
+
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.annotation.Counted;
 
@@ -70,6 +72,7 @@ public class AuthenticationService {
         // Generate tokens
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
+        
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .refreshToken(refreshToken)
@@ -86,14 +89,16 @@ public class AuthenticationService {
             metricsService.incrementUserLogins();
             throw new InternalServerErrorException("Password decryption failed");
         }
+        String login = Objects.requireNonNullElse(request.getEmail(), request.getUsername());
         
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), decryptedPassword)
+            new UsernamePasswordAuthenticationToken(login, decryptedPassword)
         );
-        var user = userService.findByEmail(request.getEmail());
+        var user = userService.findByLogin(login);
         
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
+        
         return AuthenticationResponse.builder()
             .token(jwtToken)
             .refreshToken(refreshToken)
@@ -103,10 +108,10 @@ public class AuthenticationService {
     @Timed(value = "token.refresh.duration", description = "Time taken to refresh a token")
     public AuthenticationResponse refreshToken(String refreshToken) {
         String token = refreshToken.substring(ApplicationConsts.BEARER_LENGTH); // Remove "Bearer " prefix
-        String userEmail = jwtService.extractUsername(token);
+        String username = jwtService.extractUsername(token);
         
-        if (userEmail != null) {
-            var user = userService.findByEmail(userEmail);
+        if (username != null) {
+            var user = userService.findByLogin(username);
             
             if (jwtService.isTokenValid(token, user)) {
                 var jwtToken = jwtService.generateToken(user);

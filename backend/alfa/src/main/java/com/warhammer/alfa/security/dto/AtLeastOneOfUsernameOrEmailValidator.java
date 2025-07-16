@@ -8,6 +8,6 @@ import jakarta.validation.ConstraintValidatorContext;
 public class AtLeastOneOfUsernameOrEmailValidator implements ConstraintValidator<AtLeastOneOfUsernameOrEmail, AuthenticationRequest> {
     @Override
     public boolean isValid(AuthenticationRequest value, ConstraintValidatorContext context) {
-        return Strings.isEmpty(value.getUsername()) || Strings.isEmpty(value.getEmail());
+        return !Strings.isEmpty(value.getUsername()) || !Strings.isEmpty(value.getEmail());
     }
 } 

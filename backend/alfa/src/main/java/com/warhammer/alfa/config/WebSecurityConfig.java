@@ -29,7 +29,14 @@ public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserService userService;
     private static final String[] WHITE_LIST_URL = {
-        "/**"
+        "/auth/**",
+        "/api/public/**",
+        "/error",
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/talents/**", 
+        "/skills/**", 
+        "/careers/**"
     };
 
     public WebSecurityConfig(JwtAuthenticationFilter jwtAuthFilter, UserService userService) {
@@ -44,6 +51,7 @@ public class WebSecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(WHITE_LIST_URL).permitAll()
+                .requestMatchers("/users/**", "/characters/**", "/email/**").authenticated()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
