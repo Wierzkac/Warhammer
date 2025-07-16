@@ -1,5 +1,10 @@
 package com.warhammer.alfa.enums;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum RaceEnum {
     ELF("race.elf"),
     DWARF("race.dwarf"),
@@ -7,12 +12,4 @@ public enum RaceEnum {
     HALFLING("race.halfling");
 
     private final String value;
-
-    RaceEnum(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
 } 

@@ -1,5 +1,10 @@
 package com.warhammer.alfa.enums;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum CharacteristicEnum {    
     WEAPON_SKILL("characteristic.weapon_skill"),
     BALLISTIC_SKILL("characteristic.ballistic_skill"),
@@ -22,13 +27,4 @@ public enum CharacteristicEnum {
     NONE("characteristic.none");
 
     private final String value;
-
-    CharacteristicEnum(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
 }
