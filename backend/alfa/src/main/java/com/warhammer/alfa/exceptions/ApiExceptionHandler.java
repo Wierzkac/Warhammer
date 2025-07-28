@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -23,6 +26,21 @@ public class ApiExceptionHandler {
     @ExceptionHandler(InternalServerErrorException.class)
     public ResponseEntity<Object> handleInternalServerError(InternalServerErrorException ex) {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<Object> handleDisabledAccount(DisabledException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Account is disabled. Please check your email for confirmation link.");
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> handleBadCredentials(BadCredentialsException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Invalid username or password.");
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<Object> handleUsernameNotFound(UsernameNotFoundException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Invalid username or password.");
     }
 
     @ExceptionHandler(ApiException.class)

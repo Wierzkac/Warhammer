@@ -19,7 +19,23 @@ public class LoggingAspect {
     @Pointcut("execution(public * *..*Service.*(..)) || execution(public * *..*Controller.*(..))")
     public void serviceOrControllerMethods() {}
 
-    @Around("serviceOrControllerMethods()")
+    // Pointcut for the specific method to exclude
+    @Pointcut("""
+        execution(* com.warhammer.alfa.email.EmailService.sendPendingEmails(..)) ||
+        execution(* com.warhammer.alfa.models.Career.CareerController.getAllCareers(..)) ||
+        execution(* com.warhammer.alfa.models.Career.CareerService.getAllCareers(..)) ||
+        execution(* com.warhammer.alfa.models.Talent.TalentController.getAllTalents(..)) ||
+        execution(* com.warhammer.alfa.models.Talent.TalentService.getAllTalents(..)) ||
+        execution(* com.warhammer.alfa.models.Skill.SkillController.getAllSkills(..)) ||
+        execution(* com.warhammer.alfa.models.Skill.SkillService.getAllSkills(..))
+             """)
+    public void excludeSendPendingEmails() {}
+
+    // Combined pointcut: all service/controller methods except the excluded ones
+    @Pointcut("serviceOrControllerMethods() && !excludeSendPendingEmails()")
+    public void loggableMethods() {}
+
+    @Around("loggableMethods()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getSignature().getDeclaringTypeName();
         String methodName = joinPoint.getSignature().getName();
