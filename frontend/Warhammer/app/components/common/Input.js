@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, TextInput, Text } from 'react-native';
 import { t } from 'react-native-tailwindcss';
-import { colors } from '../../../styles';
+import { useTheme } from '../../context/ThemeContext';
+import { getStyles } from '../../themes/styles';
 
 const Input = ({
   value,
@@ -16,17 +17,22 @@ const Input = ({
   inputStyle = [],
   multiline = false,
   numberOfLines = 1,
+  onBlur,
 }) => {
+  const { isDark } = useTheme();
+  const styles = getStyles(isDark);
+
   return (
     <View style={[t.mB4, ...style]}>
       {label && (
-        <Text style={[t.textGray700, t.mB1, t.fontMedium]}>
+        <Text style={styles.input.label}>
           {label}
         </Text>
       )}
       <TextInput
         value={value}
         onChangeText={onChangeText}
+        onBlur={onBlur}
         placeholder={placeholder}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
@@ -34,19 +40,15 @@ const Input = ({
         multiline={multiline}
         numberOfLines={numberOfLines}
         style={[
-          t.bgWhite,
-          t.p3,
-          t.roundedLg,
-          t.border,
-          t.borderGray300,
-          error && { borderColor: colors.danger },
+          styles.input.base,
+          error && styles.input.error,
           multiline && t.h24,
           ...inputStyle,
         ]}
-        placeholderTextColor={colors.secondary}
+        placeholderTextColor={styles.text.caption[2].color}
       />
       {error && (
-        <Text style={[t.textRed500, t.textSm, t.mT1]}>
+        <Text style={styles.text.error}>
           {error}
         </Text>
       )}

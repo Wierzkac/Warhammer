@@ -37,6 +37,8 @@ export const handleResponse = async (response) => {
 
 // Helper function to get auth token
 const getAuthToken = async () => {
-  // Implement your token retrieval logic here
+  if (typeof window !== 'undefined' && window.authToken) {
+    return window.authToken;
+  }
   return null;
 }; 

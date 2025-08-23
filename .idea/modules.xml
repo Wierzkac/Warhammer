@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Warhammer.iml" filepath="$PROJECT_DIR$/.idea/Warhammer.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/alfa.main.iml" filepath="$PROJECT_DIR$/.idea/modules/alfa.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/alfa.test.iml" filepath="$PROJECT_DIR$/.idea/modules/alfa.test.iml" />
     </modules>
   </component>
 </project>

@@ -65,3 +65,14 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// Optimize for faster startup
+springBoot {
+    buildInfo()
+}
+
+// Disable unnecessary tasks for faster build
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-parameters']
+}

@@ -2,48 +2,14 @@ import React from 'react';
 import { View, Text, Image, Pressable, ImageBackground } from 'react-native';
 import { t } from 'react-native-tailwindcss';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
+import { getStyles } from '../themes/styles';
 import { careerImages } from '../constants/careerImages';
-
-// Item card styles organized by section
-const styles = {
-  // Card container styles
-  card: {
-    base: [
-      t.mR6, // Right margin
-      t.mB4, // Bottom margin
-      t.bgWhite, // White background
-      t.roundedLg, // Large border radius
-      t.overflowHidden, // Hide overflow content
-      t.shadowMd, // Medium shadow
-    ],
-  },
-  // Image styles
-  image: {
-    base: [
-      t.w40, // Fixed width
-      t.h60, // Fixed height
-    ],
-  },
-  // Content container styles
-  content: {
-    base: [t.p4], // Padding all around
-  },
-  // Text styles
-  text: {
-    title: [
-      t.textLg, // Large text size
-      t.fontBold, // Bold font weight
-      t.textGray800, // Dark gray text color
-    ],
-    description: [
-      t.textSm, // Small text size
-      t.textGray600, // Medium gray text color
-    ],
-  },
-};
 
 const ItemCard = ({ item, type }) => {
   const navigation = useNavigation();
+  const { isDark } = useTheme();
+  const styles = getStyles(isDark);
   const isCareer = type === 'Career';
 
   // Convert spaces to underscores for career image lookup
@@ -52,7 +18,7 @@ const ItemCard = ({ item, type }) => {
   return (
     <ImageBackground
       source={require('../assets/background_light.png')}
-      style={styles.card.base}
+      style={styles.card.item}
     >
       <Pressable
         onPress={() => navigation.navigate('ItemDetails', { item })}

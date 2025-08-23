@@ -3,12 +3,10 @@ import React from 'react'
 import { t } from 'react-native-tailwindcss';
 import { useNavigation } from '@react-navigation/native';
 import ScreenLayout from '../components/common/ScreenLayout';
-import ColorPicker from '../components/ColorPicker';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 
 const ProfileContent = ({ navigation }) => {
-  const { headerColor, setHeaderColor } = useTheme();
   const { user, logout } = useAuth();
 
   if (!user) {
@@ -40,14 +38,6 @@ const ProfileContent = ({ navigation }) => {
         />
         <Text style={[t.textXl, t.fontBold]}>{user.nickname}</Text>
         <Text style={[t.textGray600]}>{user.email}</Text>
-      </View>
-
-      <View style={[t.mB8]}>
-        <Text style={[t.textLg, t.fontBold, t.mB4]}>Theme Color</Text>
-        <ColorPicker
-          selectedColor={headerColor}
-          onSelectColor={setHeaderColor}
-        />
       </View>
 
       <TouchableOpacity 

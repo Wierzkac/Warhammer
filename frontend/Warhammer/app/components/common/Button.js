@@ -1,26 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
-import { t } from 'react-native-tailwindcss';
-import { layout } from '../../../styles';
-
-// Button styles organized by purpose
-const styles = {
-  // Base button styles
-  button: {
-    base: [t.p3, t.roundedLg, t.itemsCenter, t.justifyCenter], // Padding, rounded corners, centered content
-    disabled: [t.opacity50], // Reduced opacity when disabled
-  },
-  // Text styles
-  text: {
-    base: [t.textWhite, t.fontBold, t.textCenter], // White text, bold, centered
-  },
-  // Variant-specific styles
-  variants: {
-    primary: [t.bgOrange500], // Orange background for primary buttons
-    secondary: [t.bgGray500], // Gray background for secondary buttons
-    icon: [t.bgTransparent], // Transparent background for icon buttons
-  }
-};
+import { TouchableOpacity, Text } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
+import { getStyles } from '../../themes/styles';
+import LoadingSpinner from './LoadingSpinner';
 
 const Button = ({ 
   onPress, 
@@ -32,12 +14,18 @@ const Button = ({
   textStyle = [],
   children
 }) => {
+  const { isDark } = useTheme();
+  const styles = getStyles(isDark);
+
   const getButtonStyle = () => {
-    const baseStyle = [...styles.button.base, ...styles.variants[variant]];
+    let buttonStyle = styles.button[variant] || styles.button.primary;
     if (disabled) {
-      baseStyle.push(...styles.button.disabled);
+      buttonStyle = [
+        ...buttonStyle,
+        styles.button.disabled
+      ];
     }
-    return [...baseStyle, ...style];
+    return [buttonStyle, ...style];
   };
 
   return (
@@ -47,11 +35,11 @@ const Button = ({
       style={getButtonStyle()}
     >
       {loading ? (
-        <ActivityIndicator color="white" size="small" />
+        <LoadingSpinner variant={variant} size="small" />
       ) : children ? (
         children
       ) : (
-        <Text style={[...styles.text.base, ...textStyle]}>
+        <Text style={[styles.button.text, ...textStyle]}>
           {title}
         </Text>
       )}

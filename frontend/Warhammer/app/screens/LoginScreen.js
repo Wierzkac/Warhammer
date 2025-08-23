@@ -3,33 +3,49 @@ import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { t } from 'react-native-tailwindcss';
 import { useNavigation } from '@react-navigation/native';
 import { ROUTES } from '../constants/constants';
-import { required, email } from '../utils/validation';
+import { required, password } from '../utils/validation';
 import useForm from '../hooks/useForm';
 import ScreenLayout from '../components/common/ScreenLayout';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import { getStyles } from '../themes/styles';
+import { encryptWithPublicKey } from '../services/api/encrypt';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const { login, error: authError } = useAuth();
+  const { login, error: authError, loading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const { isDark } = useTheme();
+  const styles = getStyles(isDark);
 
   const { values, errors, touched, handleChange, handleBlur, handleSubmit } = useForm(
     {
-      email: '',
+      username: '',
       password: '',
     },
     {
-      email: [required, email],
-      password: [required],
+      username: [required],
+      password: [required, password]
     }
   );
 
   const onSubmit = async (formValues) => {
     try {
       setIsLoading(true);
-      await login(formValues.email, formValues.password);
+      let encryptedPassword;
+      try {
+        encryptedPassword = await encryptWithPublicKey(formValues.password);
+      } catch (e) {
+        Alert.alert('Encryption Error', 'Could not encrypt password.');
+        setIsLoading(false);
+        return;
+      }
+      await login({
+        username: formValues.username,
+        password: encryptedPassword
+      });
       navigation.navigate(ROUTES.PROFILE);
     } catch (err) {
       Alert.alert('Login Failed', err.message);
@@ -40,19 +56,19 @@ const LoginScreen = () => {
 
   return (
     <ScreenLayout showBack={true}>
-      <View style={[t.flex1, t.p4, t.justifyCenter]}>
-        <Text style={[t.text3xl, t.fontBold, t.mB8, t.textCenter]}>
+      <View style={styles.container.screen}>
+        <Text style={[styles.header.title, t.mB8, t.textCenter]}>
           Welcome Back
         </Text>
 
         <Input
           label="Email | Nickname"
-          value={values.email}
-          onChangeText={(text) => handleChange('email', text)}
-          onBlur={() => handleBlur('email')}
+          value={values.username}
+          onChangeText={(text) => handleChange('username', text)}
+          onBlur={() => handleBlur('username')}
           placeholder="Enter your email or nickname"
           keyboardType="email-address"
-          error={touched.email && errors.email}
+          error={touched.username && errors.username}
         />
 
         <Input
@@ -66,7 +82,7 @@ const LoginScreen = () => {
         />
 
         {authError && (
-          <Text style={[t.textRed500, t.mT2, t.textCenter]}>
+          <Text style={[styles.text.error, t.mT2, t.textCenter]}>
             {authError}
           </Text>
         )}
@@ -79,9 +95,9 @@ const LoginScreen = () => {
         />
 
         <View style={[t.flexRow, t.justifyCenter, t.mT4]}>
-          <Text style={[t.textGray600]}>Don't have an account? </Text>
+          <Text style={[styles.text.caption]}>Don't have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate(ROUTES.REGISTER)}>
-            <Text style={[t.textBlue500, t.fontBold]}>Register</Text>
+            <Text style={[styles.text.link, t.fontBold]}>Register</Text>
           </TouchableOpacity>
         </View>
       </View>

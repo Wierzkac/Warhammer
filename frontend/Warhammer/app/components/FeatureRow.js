@@ -1,67 +1,40 @@
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native'
-import React from 'react'
-import PropTypes from 'prop-types'
-import { themeColors } from '../themes/themes';
-import ItemCard from './ItemCard'
+import { View, Text, Pressable, ScrollView } from 'react-native';
+import React from 'react';
+import PropTypes from 'prop-types';
+import ItemCard from './ItemCard';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
+import { getStyles } from '../themes/styles';
 
-const styles = StyleSheet.create({
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16
-  },
-  title: {
-    fontWeight: 'bold',
-    fontSize: 18
-  },
-  description: {
-    color: '#6B7280',
-    fontSize: 12
-  },
-  seeAllText: {
-    fontWeight: '600',
-    color: themeColors.text
-  },
-  scrollView: {
-    overflow: 'visible',
-    paddingVertical: 20
-  },
-  scrollViewContent: {
-    paddingHorizontal: 15
-  }
-});
-
-const SectionHeader = ({ title, description, onSeeAll }) => (
-  <View style={styles.sectionHeader}>
+const SectionHeader = ({ title, description, onSeeAll, styles }) => (
+  <View style={styles.feature.sectionHeader}>
     <View>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.description}>{description}</Text>
+      <Text style={styles.feature.title}>{title}</Text>
+      {description && <Text style={styles.feature.description}>{description}</Text>}
     </View>
     <Pressable onPress={onSeeAll}>
-      <Text style={styles.seeAllText}>See all</Text>
+      <Text style={styles.feature.seeAllText}>See all</Text>
     </Pressable>
   </View>
 );
 
 SectionHeader.propTypes = {
   title: PropTypes.string.isRequired,
-  onSeeAll: PropTypes.func
+  onSeeAll: PropTypes.func,
+  description: PropTypes.string,
+  styles: PropTypes.object.isRequired,
 };
 
-export default function FeatureRow({ title, items, type }) {
+export default function FeatureRow({ title, items, type, description }) {
   const navigation = useNavigation();
-
-  console.log('FeatureRow props:', { title, items, type });
+  const { isDark } = useTheme();
+  const styles = getStyles(isDark);
 
   const handleSeeAll = () => {
-    // Ensure we have valid items before navigating
     if (!items || !Array.isArray(items) || items.length === 0) {
       console.warn('No items to display');
       return;
     }
-
     navigation.navigate('ItemsList', {
       title,
       items: items.map(item => ({
@@ -73,7 +46,6 @@ export default function FeatureRow({ title, items, type }) {
     });
   };
 
-  // Use the provided type or determine it based on the title
   const getItemType = () => {
     if (type) return type;
     if (title.toLowerCase().includes('career')) return 'Career';
@@ -83,7 +55,6 @@ export default function FeatureRow({ title, items, type }) {
   };
 
   const itemType = getItemType();
-  console.log('ItemType:', itemType);
 
   if (!items || !Array.isArray(items)) {
     console.warn('Invalid items prop:', items);
@@ -94,13 +65,15 @@ export default function FeatureRow({ title, items, type }) {
     <View>
       <SectionHeader 
         title={title} 
+        description={description}
         onSeeAll={handleSeeAll}
+        styles={styles}
       />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollViewContent}
-        style={styles.scrollView}
+        contentContainerStyle={styles.feature.scrollViewContent}
+        style={styles.feature.scrollView}
       >
         {items.map((item, index) => {
           return (
@@ -113,7 +86,7 @@ export default function FeatureRow({ title, items, type }) {
         })}
       </ScrollView>
     </View>
-  )
+  );
 }
 
 FeatureRow.propTypes = {

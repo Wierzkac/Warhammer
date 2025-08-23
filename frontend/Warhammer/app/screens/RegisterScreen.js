@@ -3,12 +3,13 @@ import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { t } from 'react-native-tailwindcss';
 import { useNavigation } from '@react-navigation/native';
 import { ROUTES } from '../constants/constants';
-import { required, email } from '../utils/validation';
+import { required, email, password, match } from '../utils/validation';
 import useForm from '../hooks/useForm';
 import ScreenLayout from '../components/common/ScreenLayout';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { useAuth } from '../context/AuthContext';
+import { encryptWithPublicKey } from '../services/api/encrypt';
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
@@ -17,23 +18,35 @@ const RegisterScreen = () => {
 
   const { values, errors, touched, handleChange, handleBlur, handleSubmit } = useForm(
     {
-      nickname: '',
+      username: '',
       email: '',
       password: '',
       confirmPassword: '',
     },
     {
-      nickname: [required],
+      username: [required],
       email: [required, email],
-      password: [required],
-      confirmPassword: [required, (value) => value === values.password || 'Passwords do not match'],
+      password: [required, password],
+      confirmPassword: [required, match('password', 'Password')],
     }
   );
 
   const onSubmit = async (formValues) => {
     try {
       setIsLoading(true);
-      await register(formValues.nickname, formValues.email, formValues.password);
+      let encryptedPassword;
+      try {
+        encryptedPassword = await encryptWithPublicKey(formValues.password);
+      } catch (e) {
+        Alert.alert('Encryption Error', 'Could not encrypt password.');
+        setIsLoading(false);
+        return;
+      }
+      await register({
+        username: formValues.username,
+        email: formValues.email,
+        password: encryptedPassword
+      });
       navigation.navigate(ROUTES.PROFILE);
     } catch (err) {
       Alert.alert('Registration Failed', err.message);
@@ -50,12 +63,12 @@ const RegisterScreen = () => {
         </Text>
 
         <Input
-          label="Nickname"
-          value={values.nickname}
-          onChangeText={(text) => handleChange('nickname', text)}
-          onBlur={() => handleBlur('nickname')}
-          placeholder="Choose a nickname"
-          error={touched.nickname && errors.nickname}
+          label="username"
+          value={values.username}
+          onChangeText={(text) => handleChange('username', text)}
+          onBlur={() => handleBlur('username')}
+          placeholder="Choose a username"
+          error={touched.username && errors.username}
         />
 
         <Input

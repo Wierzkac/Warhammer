@@ -1,35 +1,8 @@
 import apiConfig from '../../config/api';
-import { ApiError, NetworkError } from './errors';
+import { ApiError } from './errors';
 import { apiCache } from './cache';
-import { addAuthHeader, handleResponse } from './interceptors';
+import { addAuthHeader } from './interceptors';
 
-// Retry logic
-const withRetry = (fn, retries = 3, delay = 1000) => {
-  return async (...args) => {
-    let lastError;
-    for (let i = 0; i < retries; i++) {
-      try {
-        console.log(`API call attempt ${i + 1}/${retries}`);
-        const result = await fn(...args);
-        console.log(`API call successful on attempt ${i + 1}`);
-        return result;
-      } catch (error) {
-        lastError = error;
-        console.warn(`API request failed (attempt ${i + 1}/${retries}):`, error);
-        
-        if (error instanceof NetworkError) {
-          const waitTime = delay * Math.pow(2, i);
-          console.log(`Retrying in ${waitTime}ms...`);
-          await new Promise(resolve => setTimeout(resolve, waitTime));
-          continue;
-        }
-        throw error;
-      }
-    }
-    console.error('All retry attempts failed:', lastError);
-    throw lastError;
-  };
-};
 
 const request = async (endpoint, options = {}) => {
   const url = `${apiConfig.apiUrl}${endpoint}`;
@@ -61,14 +34,32 @@ const request = async (endpoint, options = {}) => {
     console.log('Response status:', response.status);
 
     if (!response.ok) {
-      throw new ApiError(`HTTP error! status: ${response.status}`);
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch (e) {
+        // If we can't parse the error response, use the default message
+      }
+      throw new ApiError(errorMessage, response.status, null);
     }
 
-    const data = await response.json();
-    console.log('Response data:', data);
+    // Check if response has content before trying to parse JSON
+    const contentType = response.headers.get('content-type');
+    const contentLength = response.headers.get('content-length');
+    
+    let data = null;
+    if (contentType && contentType.includes('application/json') && contentLength !== '0') {
+      data = await response.json();
+      console.log('Response data:', data);
+    } else {
+      console.log('Empty response or non-JSON content');
+    }
 
     // Cache successful GET responses
-    if (options.method === 'GET' || !options.method) {
+    if ((options.method === 'GET' || !options.method) && data) {
       apiCache.set(url, data);
     }
 

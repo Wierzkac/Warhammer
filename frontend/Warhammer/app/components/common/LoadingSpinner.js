@@ -1,11 +1,14 @@
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { t } from 'react-native-tailwindcss';
+import { ActivityIndicator } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
+import { getStyles } from '../../themes/styles';
 
-const LoadingSpinner = ({ size = 'large', color = '#0000ff' }) => (
-  <View style={[t.flex1, t.itemsCenter, t.justifyCenter]}>
-    <ActivityIndicator size={size} color={color} />
-  </View>
-);
+const LoadingSpinner = ({ size = 'small', color, variant = 'primary' }) => {
+  const { isDark } = useTheme();
+  const styles = getStyles(isDark);
+  // Use color prop if provided, otherwise use centralized spinner color
+  const spinnerColor = color || styles.button.spinner?.[variant]?.color || styles.button.text[0]?.color || '#fff';
+  return <ActivityIndicator size={size} color={spinnerColor} />;
+};
 
 export default LoadingSpinner; 
